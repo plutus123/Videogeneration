@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Manim outputs
+media/
+*.mp4
+*.svg
+*.png
+
+# Generated scenes and outputs
+generated_scenes/
+assets/outputs/
+assets/narration/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

@@ -1,0 +1,51 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    width: 1920px; height: 1080px; overflow: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #0a0a2e 0%, #1a1a4e 30%, #0d1b3e 60%, #0a0a2e 100%);
+    color: white;
+}
+.slide {
+    width: 1920px; height: 1080px; position: relative;
+    display: flex; flex-direction: column; padding: 60px 80px;
+}
+.bg-orb {
+    position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12; z-index: 0;
+}
+.bg-orb-1 { width: 500px; height: 500px; background: #00D4FF; top: -100px; right: -100px; }
+.bg-orb-2 { width: 400px; height: 400px; background: #7B61FF; bottom: -80px; left: -80px; }
+.grid-overlay {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+}
+.content { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; }
+.progress-bar {
+    position: absolute; bottom: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, #00D4FF, #7B61FF); z-index: 2;
+}
+
+.center { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:28px; }
+.main-title {
+    font-size:72px; font-weight:800; line-height:1.2; max-width:1400px; letter-spacing:-1px;
+    background: linear-gradient(135deg, #00D4FF 0%, #7B61FF 50%, #00D4FF 100%);
+    background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.divider { width:120px; height:4px; background:linear-gradient(90deg,#00D4FF,#7B61FF); border-radius:2px; }
+.subtitle { font-size:28px; color:rgba(255,255,255,0.65); font-weight:300; max-width:900px; line-height:1.6; }
+</style></head><body>
+<div class="slide">
+    <div class="bg-orb bg-orb-1"></div><div class="bg-orb bg-orb-2"></div><div class="grid-overlay"></div>
+    <div class="content"><div class="center">
+        <div class="main-title">Rolls-Royce Appoints Two New Members to North American Board</div>
+        <div class="divider"></div>
+        <div class="subtitle">Rolls-Royce announced the appointment of General Laura Richardson (U.S. Army, retired) and General Duke Richardson (U.S. Air Force, retired) to the Board of Directors for Rolls-Royce North America.</div>
+    </div></div>
+    <div class="progress-bar" style="width:6.666666666666667%"></div>
+</div></body></html>

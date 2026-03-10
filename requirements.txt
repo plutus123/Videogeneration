@@ -1,0 +1,6 @@
+openai
+python-dotenv
+moviepy
+mutagen
+playwright
+gTTS
