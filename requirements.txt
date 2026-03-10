@@ -2,5 +2,5 @@ openai
 python-dotenv
 moviepy
 mutagen
-playwright
+Pillow
 gTTS
