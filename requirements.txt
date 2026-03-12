@@ -4,3 +4,5 @@ moviepy
 mutagen
 Pillow
 gTTS
+requests
+beautifulsoup4

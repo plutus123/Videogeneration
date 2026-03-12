@@ -1,0 +1,86 @@
+{
+  "section_mapping": {
+    "Macroeconomic": ["Macroeconomic"],
+    "Competitors": ["Civil", "Defence", "PowerSystems"]
+  },
+  "categories": {
+    "Macroeconomic": [
+      {
+        "url": "https://defence.in/threads/iran-sought-permission-for-docking-of-3-ships-in-indian-ports-approval-granted-eam-jaishankar.17120/",
+        "title": "Iran Ships Dock at Indian Ports Amid West Asia Tensions",
+        "fallback_summary": "Iran sought India's permission for three ships to dock at Indian ports and approval was granted the next day, EAM Jaishankar said. IRIS LAVAN docked in Kochi on March 4. The sinking of Iranian frigate IRIS Dena by a US submarine off Sri Lanka's coast killed 87 Iranian sailors and triggered concerns about the West Asia conflict expanding to the Indian Ocean. Jaishankar said the government is fully committed to ensuring energy security amid disruptions from the escalating conflict. One crore Indian citizens live and work in Gulf nations. The conflict has intensified with mounting destruction and deaths across the region."
+      },
+      {
+        "url": "https://www.business-standard.com/industry/aviation/indian-airlines-cancel-279-international-flights-amid-west-asia-crisis-126030800778_1.html",
+        "title": "Indian Airlines Cancel 279 International Flights Amid West Asia Crisis",
+        "fallback_summary": "A total of 49 flight operations were scheduled by Indian domestic carriers from West Asia to India. As of 8 March, 279 flights scheduled to be operated by Indian domestic carriers have been cancelled amid the West Asia conflict. Air India extended the suspension of all flights to and from the UAE, Saudi Arabia, Israel, and Qatar. The situation in West Asia has disrupted air travel across the region, affecting Indian airlines' international operations significantly."
+      },
+      {
+        "url": "https://www.deccanherald.com/world/us/west-asia-conflict-us-president-donald-trump-asks-defence-contractors-to-quadruple-production-3922886",
+        "title": "Trump Asks Defence Contractors to Quadruple Production",
+        "fallback_summary": "US President Donald Trump asked defence contractors to quadruple production amid the West Asia conflict. Companies including Lockheed Martin, Raytheon parent RTX, BAE Systems, Boeing, Honeywell Aerospace, L3Harris and Northrop Grumman attended the meeting. Trump touted a good meeting with defense contractors as tensions with Iran escalated. The US has been actively engaged in the West Asia conflict, with reports of destroying Iranian mine vessels near the Strait of Hormuz."
+      }
+    ],
+    "Civil": [
+      {
+        "url": "https://www.geaerospace.com/news/articles/ge-aerospace-invest-another-1b-us-manufacturing",
+        "title": "GE Aerospace to Invest Another $1B in US Manufacturing",
+        "fallback_summary": "GE Aerospace plans to invest another $1 billion in its U.S. manufacturing sites and supplier base during 2026 to accelerate engine deliveries and strengthen defense production. The company plans to hire 5,000 U.S. workers. Since 2024, GE Aerospace has announced plans to invest more than $2.5 billion across its U.S. manufacturing sites. More than $275 million of the $1 billion is planned for defense engine sites. The investment includes $200 million to expand LEAP engine manufacturing capacity and $115M in Cincinnati for advanced 3D metal printing. Commercial engine deliveries rose 25% and defense engine deliveries rose 30% in 2025."
+      },
+      {
+        "url": "https://www.airbus.com/en/newsroom/press-releases/2026-03-airbus-scales-up-make-in-india-with-new-5000-seater-technology-centre-in-bengaluru",
+        "title": "Airbus Opens 5,000-Seater Tech Centre in Bengaluru",
+        "fallback_summary": "Airbus inaugurated a state-of-the-art 880,000 sq ft technology centre in Bengaluru on March 6, 2026, accommodating about 5,000 employees. The facility serves as a hub for engineering, digital transformation, customer services and procurement. It is Airbus' largest engineering and digital centre outside Europe. Airbus has more than tripled its annual sourcing from India from $500 million in 2019 to over $1.5 billion today, on track to exceed $2 billion before end of decade. Over 100 Indian companies currently supply critical components for global Airbus programmes. The campus supports C295 military transport assembly in Vadodara and H125 helicopter assembly near Bengaluru."
+      },
+      {
+        "url": "https://defence.in/threads/embraer-proposes-indian-assembly-line-for-e175-jets-by-2028-conditional-on-securing-at-least-200-orders.17121/",
+        "title": "Embraer Proposes Indian Assembly Line for E175 Jets by 2028",
+        "fallback_summary": "Brazilian planemaker Embraer could roll out E175-E1 regional jets from a potential production line in India as early as 2028, conditional on orders for at least 200 aircraft. Embraer and India's Adani Group announced a memorandum of understanding to establish a final assembly line. Embraer has identified at least 1,800 Indian routes that could be operated by E1 jets seating up to 88 people. An India plant would help Embraer boost production while filling its Brazil line with newer E2 orders. Embraer now sees scope to hit 100 commercial aircraft deliveries in 2027 instead of 2028. Embraer has partnered with Mahindra on the C-390 military cargo jet for India."
+      }
+    ],
+    "Defence": [
+      {
+        "url": "https://www.newsonair.gov.in/union-minister-piyush-goyal-highlights-the-rapid-rise-of-indias-startup-ecosystem-in-defence-space-sectors/",
+        "title": "Piyush Goyal Highlights Rise of India's Startup Ecosystem in Defence and Space",
+        "fallback_summary": "Commerce and Industry Minister Piyush Goyal highlighted the rapid rise of India's startup ecosystem in the defence and space sectors. The transformation is powered by MSMEs integrating Indian innovation into global supply chains. Goyal emphasised PM Modi's mantra of speed, skill, and scale as key driver of India's defence self-reliance. He focused on semiconductors and clean energy to further drive India's self-reliance journey."
+      },
+      {
+        "url": "https://economictimes.indiatimes.com/news/defence/india-was-worlds-2nd-largest-importer-of-arms-in-202125-accounted-for-8-2-of-global-arms-receipts-think-tank-says/articleshow/129313577.cms",
+        "title": "India World's 2nd Largest Arms Importer with 8.2% Global Share",
+        "fallback_summary": "India was the world's second largest arms importer during 2021-25 with 8.2% share of total global imports per SIPRI. India has shifted arms relations away from Russia towards Western suppliers. Russia's share of Indian arms imports dropped from 70% in 2011-15 to 40% in 2021-25. India signed IGA with France for 26 Rafale Aircraft for the Navy. Defence budget rose from Rs 2.53 lakh crore in 2013-14 to Rs 7.85 lakh crore in 2026-27. Rs 1.39 lakh crore allocated for domestic defence procurement. US arms exports grew 27% and account for 42% of global arms exports."
+      },
+      {
+        "url": "https://www.newindianexpress.com/nation/2026/Mar/10/centre-unveils-vision-2047-roadmap-to-transform-armed-forces-for-future-wars",
+        "title": "Defence Forces Vision 2047 Roadmap Unveiled",
+        "fallback_summary": "India's Defence Ministry unveiled 'Defence Forces Vision 2047: A Roadmap for a Future-Ready Indian Military'. Released by Defence Minister Rajnath Singh, it outlines structural reforms, capability enhancements and organisational changes. The roadmap envisages transformation into an integrated, multi-domain and agile force. It is closely linked to establishing integrated theatre commands bringing Army, Navy and Air Force under unified commands. The push for theaterisation targets fruition by May 2026. Key focus on Aatmanirbharta in defence with emphasis on indigenous technologies and domestic manufacturing."
+      },
+      {
+        "url": "https://economictimes.indiatimes.com/news/defence/amid-conflicts-countries-will-have-to-build-their-industrial-complex-upgrade-tech-navy-chief/articleshow/129168214.cms",
+        "title": "Navy Chief: Countries Must Build Own Industrial Complex Amid Conflicts",
+        "fallback_summary": "Navy Chief Admiral Dinesh K Tripathi said countries must build their own industrial complex, upgrade technology while production is taking place, and be prepared for rapid adaptation. Speaking at the Raisina Dialogue, he said the idea of short and decisive war has questions over it and the post-Cold War peace dividend has ended. India believes in self-reliance and deals with many partner nations for co-development and co-production. The Navy is looking at indigenous solutions and is optimistic about becoming self-reliant in coming years."
+      },
+      {
+        "url": "https://www.fortuneindia.com/business-news/bengaluru-ai-warfare-defence-startup-tests-indias-first-autonomous-swarm-interceptor/130994",
+        "title": "Flying Wedge Tests India's First Autonomous Swarm Interceptor",
+        "fallback_summary": "Bengaluru-based AI warfare startup Flying Wedge Defence & Aerospace (FWDA) successfully tested India's first autonomous swarm interceptor, FWD YAMA. Designed for counter-UAS, air defence, and SEAD missions. The interceptor could enable aerial interception at up to 100 times lower cost than conventional missile-based systems, with projected unit cost of about $10,000. In recent conflicts, Iranian drones costing under $20,000 pressured US Patriot systems costing $4 million per launch. The system uses AI, precision-kill capability, swarm coordination, and network-centric integration. It can operate in GPS-denied and communication-contested environments."
+      },
+      {
+        "url": "https://defence.in/threads/ada-validates-advanced-intake-aerodynamics-for-amca-research-achieves-98-pressure-recovery-for-stealth-aircraft.17110/",
+        "title": "ADA Validates AMCA Intake Aerodynamics: 98% Pressure Recovery",
+        "fallback_summary": "India's Aeronautical Development Agency (ADA) announced a breakthrough in intake systems for next-generation stealth fighters. Published in February 2026 Journal of Aerospace Sciences and Technologies. The research is pivotal for the Advanced Medium Combat Aircraft (AMCA), India's fifth-generation fighter program. Achieved 98% pressure recovery at transonic speeds — a world-class benchmark. Design remained stable even at 60-degree angle of attack. Research supports development of blended wing-body and tailless aircraft for sixth-generation concepts."
+      },
+      {
+        "url": "https://defence.in/threads/13-ton-ghatak-ucav-receives-critical-development-clearance-poised-to-become-iafs-primary-stealth-strike-platform.17118/",
+        "title": "13-Ton Ghatak UCAV Receives Critical Development Clearance",
+        "fallback_summary": "India's Defence Procurement Board cleared design and development of the Ghatak Unmanned Combat Aerial Vehicle (UCAV). The 13-ton class autonomous aircraft is set to become the IAF's future deep-strike and electronic warfare cornerstone. Primary objective is Suppression and Destruction of Enemy Air Defences (SEAD/DEAD). Uses flying-wing configuration for reduced radar signature. Powered by indigenous Kaveri engine with 49 kilonewtons of thrust. Combat radius over 1,000 km with 5-8 hours loiter time. Will feature AESA radar and EO/IR sensors for autonomous targeting. Positioned to replace retiring SEPECAT Jaguar fleet."
+      }
+    ],
+    "PowerSystems": [
+      {
+        "url": "https://www.thehindubusinessline.com/companies/tvs-supply-chain-solutions-strengthens-caterpillars-global-supply-chains-from-india/article70726438.ece",
+        "title": "TVS Supply Chain Strengthens Caterpillar's Global Network from India",
+        "fallback_summary": "TVS Supply Chain Solutions is strengthening Caterpillar's global supply chains from India by setting up a 40,000 sq ft warehousing facility at the Free Trade and Warehousing Zone near Chennai. The facility has approximately 4,000 pallet positions and is located along the Chennai-Bengaluru Industrial Corridor. It enables parts procurement from multiple countries and supports Caterpillar's manufacturing operations. The facility reinforces the 'Make in India for the World' initiative. TVS SCS also manages Caterpillar's external warehouse operations in Hosur."
+      }
+    ]
+  }
+}

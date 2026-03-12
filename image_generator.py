@@ -27,7 +27,7 @@ def _load_font(size=40):
     return ImageFont.load_default()
 
 
-def generate_scene_image(prompt, output_path, style="", model="gpt-image-1-mini"):
+def generate_scene_image(prompt, output_path, style="", model="gpt-image-1.5"):
     client = OpenAI()
     full_prompt = prompt
     if style:
