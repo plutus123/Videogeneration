@@ -44,6 +44,9 @@ def _generate_video(data, args):
             num = scene["scene_number"]
             raw_path = os.path.join(image_dir, f"scene_{num}_raw.png")
             final_path = os.path.join(image_dir, f"scene_{num}.png")
+            if os.path.exists(final_path) and os.path.getsize(final_path) > 0:
+                print(f"  Scene {num}/{total} (cached)")
+                continue
             print(f"  Scene {num}/{total}")
             generate_scene_image(scene["visual_prompt"], raw_path, style=style, model=args.model)
             text = scene.get("on_screen_text", "")
@@ -56,6 +59,9 @@ def _generate_video(data, args):
             script = scene.get("audio_script", "")
             if script:
                 audio_path = os.path.join(audio_dir, f"scene_{num}.mp3")
+                if os.path.exists(audio_path) and os.path.getsize(audio_path) > 0:
+                    print(f"  Scene {num}/{total} (cached)")
+                    continue
                 print(f"  Scene {num}/{total}")
                 text_to_speech(script, audio_path, voice=args.voice)
 
@@ -76,7 +82,8 @@ def main():
     parser.add_argument("--output", default="assets/outputs/final_video.mp4")
     parser.add_argument("--skip-images", action="store_true")
     parser.add_argument("--skip-audio", action="store_true")
-    parser.add_argument("--model", default="gpt-image-1.5")
+    parser.add_argument("--model", default=None,
+                        help="Azure image deployment (default: from .env)")
     parser.add_argument("--voice", default="alloy")
     args = parser.parse_args()
 

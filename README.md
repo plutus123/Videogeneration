@@ -1,4 +1,4 @@
-# Vizh -- Scene-Based Video Generator
+RR-Video Generator
 
 Generates cinematic narrated videos from news URLs or a pre-built JSON scene plan. Extracts content from articles, uses GPT to plan scenes, generates AI images, narrates with TTS, and assembles a polished MP4.
 
@@ -21,11 +21,6 @@ Generates cinematic narrated videos from news URLs or a pre-built JSON scene pla
 ## Quick start
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-echo "OPENAI_API_KEY=sk-..." > .env
 
 # From URLs (extract + plan + generate video)
 python main.py urls_config.json --from-urls
@@ -76,46 +71,3 @@ Output: `assets/outputs/final_video.mp4`
   "overall_style": "Cinematic documentary style with warm lighting."
 }
 ```
-
-## CLI options
-
-```
-python main.py INPUT [--from-urls] [--plan-only] [--scene-json PATH]
-              [--output PATH] [--skip-images] [--skip-audio]
-              [--model MODEL] [--voice VOICE]
-```
-
-- `--from-urls` -- treat input as a URLs config (extract content + generate scene plan + build video)
-- `--plan-only` -- with `--from-urls`: only generate scene JSON, skip video generation
-- `--scene-json` -- output path for the generated scene plan (default `generated_scene_plan.json`)
-- `--skip-images` -- reuse existing images in `assets/images/`
-- `--skip-audio` -- reuse existing audio in `assets/audio/`
-- `--model` -- image generation model (default `gpt-image-1.5`)
-- `--voice` -- TTS voice: alloy, echo, fable, onyx, nova, shimmer (default `alloy`)
-
-## Project layout
-
-```
-main.py              Entry point -- orchestrates the full pipeline
-content_extractor.py URL fetching + article text extraction (with fallbacks)
-scene_planner.py     GPT-based scene plan generation from extracted content
-image_generator.py   GPT image generation + Pillow text overlay
-video_builder.py     MoviePy video assembly with transitions
-utils/
-  tts_utils.py       Text-to-speech (OpenAI TTS / gTTS fallback)
-urls_config.json     Example URL config with categorized article links
-assets/
-  images/            Generated scene images
-  audio/             Generated narration audio
-  outputs/           Final video
-```
-
-## Requirements
-
-- Python 3.10+
-- OpenAI API key (GPT, image generation, TTS)
-- ffmpeg (for video encoding)
-
-## License
-
-MIT

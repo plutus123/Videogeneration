@@ -3,6 +3,7 @@ python-dotenv
 moviepy
 mutagen
 Pillow
-gTTS
 requests
 beautifulsoup4
+lxml
+cloudscraper

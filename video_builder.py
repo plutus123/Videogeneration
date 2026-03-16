@@ -16,7 +16,7 @@ def _audio_duration(path):
         return 0
 
 
-def build_video(scenes, image_dir, audio_dir, output_path, transition=0.8):
+def build_video(scenes, image_dir, audio_dir, output_path):
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     clips = []
 
@@ -36,7 +36,7 @@ def build_video(scenes, image_dir, audio_dir, output_path, transition=0.8):
         if has_audio:
             audio_dur = _audio_duration(audio_path)
             if audio_dur > 0:
-                duration = max(target_dur, audio_dur + 0.5)
+                duration = max(target_dur, audio_dur + 0.3)
 
         clip = (
             ImageClip(img_path)
@@ -45,22 +45,17 @@ def build_video(scenes, image_dir, audio_dir, output_path, transition=0.8):
         )
 
         if has_audio:
-            clip = clip.with_audio(AudioFileClip(audio_path))
+            audio_clip = AudioFileClip(audio_path)
+            clip = clip.with_audio(audio_clip)
 
         clips.append(clip)
 
     if not clips:
         raise ValueError("No clips to assemble")
 
-    clips[0] = clips[0].with_effects([vfx.FadeIn(1.0)])
-    clips[-1] = clips[-1].with_effects([vfx.FadeOut(1.5)])
-
-    if len(clips) > 1 and transition > 0:
-        for i in range(1, len(clips)):
-            clips[i] = clips[i].with_effects([vfx.CrossFadeIn(transition)])
-        final = concatenate_videoclips(clips, method="compose", padding=-transition)
-    else:
-        final = concatenate_videoclips(clips, method="compose")
+    clips[0] = clips[0].with_effects([vfx.FadeIn(0.5)])
+    clips[-1] = clips[-1].with_effects([vfx.FadeOut(1.0)])
+    final = concatenate_videoclips(clips, method="compose")
 
     final.write_videofile(
         output_path, fps=FPS, codec="libx264",
