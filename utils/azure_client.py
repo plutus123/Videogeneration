@@ -13,6 +13,14 @@ def get_azure_client() -> AzureOpenAI:
     )
 
 
+def get_tts_client() -> AzureOpenAI:
+    return AzureOpenAI(
+        azure_endpoint=os.getenv("AZURE_TTS_ENDPOINT"),
+        api_key=os.getenv("AZURE_TTS_API_KEY"),
+        api_version=os.getenv("AZURE_TTS_API_VERSION", "2025-03-01-preview"),
+    )
+
+
 def get_chat_deployment() -> str:
     return os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5-nano")
 
@@ -22,4 +30,4 @@ def get_image_deployment() -> str:
 
 
 def get_tts_deployment() -> str:
-    return os.getenv("AZURE_OPENAI_TTS_DEPLOYMENT", "gpt-4o-mini-tts")
+    return os.getenv("AZURE_TTS_DEPLOYMENT", "tts")

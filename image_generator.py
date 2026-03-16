@@ -3,10 +3,7 @@ import sys
 import base64
 import urllib.request
 from PIL import Image, ImageDraw, ImageFont
-from dotenv import load_dotenv
 from utils.azure_client import get_azure_client, get_image_deployment
-
-load_dotenv()
 
 if sys.platform == "win32":
     FONT_PATHS = [
@@ -89,14 +86,18 @@ def add_text_overlay(image_path, text, output_path=None):
     overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
 
-    bar_h = int(h * 0.1)
+    bar_h = int(h * 0.12)
     bar_y = h - bar_h
 
+    navy = (27, 42, 74)
     for y in range(bar_h):
-        alpha = int(190 * (y / bar_h))
-        draw.line([(0, bar_y + y), (w, bar_y + y)], fill=(0, 0, 0, alpha))
+        alpha = int(220 * (y / bar_h))
+        draw.line([(0, bar_y + y), (w, bar_y + y)], fill=(*navy, alpha))
 
-    font_size = int(bar_h * 0.42)
+    gold = (184, 134, 11)
+    draw.line([(0, bar_y), (w, bar_y)], fill=(*gold, 180), width=2)
+
+    font_size = int(bar_h * 0.38)
     font = _load_font(font_size)
     bbox = draw.textbbox((0, 0), text, font=font)
     tw = bbox[2] - bbox[0]
@@ -104,8 +105,8 @@ def add_text_overlay(image_path, text, output_path=None):
     tx = (w - tw) // 2
     ty = bar_y + (bar_h - th) // 2
 
-    draw.text((tx + 2, ty + 2), text, fill=(0, 0, 0, 180), font=font)
-    draw.text((tx, ty), text, fill=(255, 255, 255, 240), font=font)
+    draw.text((tx + 1, ty + 1), text, fill=(0, 0, 0, 120), font=font)
+    draw.text((tx, ty), text, fill=(255, 255, 255, 245), font=font)
 
     result = Image.alpha_composite(img, overlay)
     result.convert("RGB").save(output_path, quality=95)
