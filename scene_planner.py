@@ -2,38 +2,54 @@ import os
 import json
 from utils.azure_client import get_azure_client, get_chat_deployment
 
-VIDEO_PRODUCER_PROMPT = """You are an expert video producer creating a corporate intelligence briefing video for the leadership team of Rolls-Royce (aviation/defence company).
+VIDEO_PRODUCER_PROMPT = """You are creating a NotebookLM-style explainer video for a Rolls-Royce aviation/defence intelligence briefing.
 
-STRICT DURATION RULES (TTS reads at 2.5 words per second):
-- Target video: 150 seconds (2.5 minutes). Hard max: 180 seconds (3 minutes).
-- TOTAL word count across ALL audio_scripts: MAX 400 words. Count carefully.
-- Each audio_script: MAX 30 words (1-2 short sentences). This produces ~12 seconds of audio.
-- Each scene duration_seconds: set to 12 (to match audio length).
-- Total scenes: 12-15 maximum.
+DURATION RULES (TTS reads ~2.5 words/sec):
+- Target: 150s (2.5 min). Hard max: 180s (3 min).
+- Total words across ALL audio_scripts: MAX 400. Count carefully.
+- Each audio_script: MAX 30 words (1-2 short sentences).
+- Each scene duration_seconds: 12.
+- Total scenes: 12-15.
 
-SCENE NUMBERING AND DISTRIBUTION:
+SCENE DISTRIBUTION:
 - Start from scene_number 1.
-- ALL sections from the context MUST appear. No section may be skipped.
-- 1 article = 1 scene. Multiple related articles can share 1 scene.
-- Distribute proportionally: a section with 1 article gets 1 scene, a section with 8 articles gets 5-7 scenes.
+- ALL sections MUST appear. 1 article = 1 scene. Related articles can share 1 scene.
+- Proportional: 1 article section gets 1 scene, 8 article section gets 5-7 scenes.
 
-NARRATION RULES:
-- Each audio_script must be exactly 1-2 sentences, max 30 words.
-- Write in a single consistent authoritative corporate narrator voice.
-- Use smooth transitions: "Meanwhile...", "Turning to...", "In parallel..."
+NARRATION:
+- Max 30 words per audio_script. Single professional narrator voice.
+- Smooth transitions between scenes.
 - Preserve key numbers, names, dollar figures, percentages.
-- Tone: professional, executive-briefing style, factual, confident.
 
-VISUAL STYLE (Rolls-Royce Corporate Theme):
-- Color palette: deep navy blue (#1B2A4A), silver/platinum (#C0C0C0), white, with subtle gold (#B8860B) accents.
-- Aesthetic: clean corporate boardroom style, NOT futuristic or cartoon-animated.
-- Think: polished executive presentation slides, professional photography, real-world settings.
-- Backgrounds: clean gradients (navy to dark blue), subtle geometric patterns, professional overlays.
-- Data visuals: clean bar charts, minimalist infographics with navy/silver/white palette.
-- Settings: real boardrooms, aircraft hangars, defence facilities, factory floors, diplomatic halls.
-- No neon, no sci-fi, no cartoon characters, no overly stylized graphics.
-- visual_prompt describes a SINGLE photorealistic corporate-style image (not video or animation).
-- Every visual_prompt MUST include: "Corporate photography style, Rolls-Royce navy and silver color theme, clean professional aesthetic"
+SCENE TYPES (each scene MUST have exactly one scene_type):
+
+1. "title" - Opening/section title card
+   Required fields: title, subtitle
+   Use for: first scene, section transitions
+
+2. "big_number" - Emphasize a key statistic
+   Required fields: number, label
+   Use for: impactful data points ($1B, 8.2%, 3,300 etc.)
+
+3. "comparison" - Side-by-side two-panel comparison
+   Required fields: title, left_label, left_value, left_highlight, right_label, right_value, right_highlight
+   Use for: before/after, old/new, two competing things
+
+4. "steps" - Process flow (2-4 steps)
+   Required fields: title, step_1, step_2, step_3 (step_4 optional)
+   Use for: processes, timelines, sequences
+
+5. "statement" - Bold text with highlighted keywords on light background
+   Required fields: text, highlight_1, highlight_2 (highlight_3 optional)
+   Use for: key insights, important quotes, bold conclusions
+
+6. "key_point" - Heading with bullet points
+   Required fields: heading, point_1, point_2, point_3 (point_4, point_5 optional)
+   Use for: data summaries, multiple facts about one topic
+
+ICON HINT: Every scene MUST include "icon_hint" - a 2-4 word description of a simple object/symbol to illustrate the scene (e.g. "jet engine", "shield badge", "factory building", "military aircraft", "dollar coins", "world map"). No people. No complex scenes.
+
+VARIETY RULE: Use at least 4 different scene_types across the video. Do NOT use the same type for more than 3 consecutive scenes. Mix them for visual variety.
 
 Output JSON:
 {
@@ -42,13 +58,35 @@ Output JSON:
     {
       "scene_number": 1,
       "section": "SECTION NAME",
+      "scene_type": "title",
       "duration_seconds": 12,
-      "visual_prompt": "Corporate photography style, Rolls-Royce navy and silver color theme, clean professional aesthetic. [scene description]",
-      "audio_script": "Max 30 words narration with key facts.",
-      "on_screen_text": "Short label with key number"
+      "audio_script": "Max 30 words narration.",
+      "icon_hint": "jet engine",
+      "title": "Title Text",
+      "subtitle": "Subtitle text"
+    },
+    {
+      "scene_number": 2,
+      "section": "SECTION NAME",
+      "scene_type": "big_number",
+      "duration_seconds": 12,
+      "audio_script": "Max 30 words narration.",
+      "icon_hint": "dollar coins",
+      "number": "$1B",
+      "label": "What this number represents"
+    },
+    {
+      "scene_number": 3,
+      "section": "SECTION NAME",
+      "scene_type": "statement",
+      "duration_seconds": 12,
+      "audio_script": "Max 30 words narration.",
+      "icon_hint": "military aircraft",
+      "text": "Bold statement with key insight here",
+      "highlight_1": "key",
+      "highlight_2": "insight"
     }
-  ],
-  "overall_style": "Corporate Rolls-Royce executive briefing: navy blue, silver, photorealistic, professional"
+  ]
 }
 
 """

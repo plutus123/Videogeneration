@@ -1,0 +1,168 @@
+{
+  "textual_summary": "Macro context: Iran seeks docking rights and energy links, elevating West Asia risk and energy security. Competitor briefing covers GE and Airbus investments, Embraer India plans, India's defence startup rise, SIPRI arms data, Raisina dialogue themes, FWDA autonomous swarms, US production ramp, and AMCA/Ghatak stealth programs.",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "section": "MACROECONOMIC",
+      "scene_type": "title",
+      "duration_seconds": 12,
+      "audio_script": "Global energy dynamics and regional tensions frame India’s strategic choices as Iran seeks dockings and energy links amid West Asia volatility.",
+      "icon_hint": "world map",
+      "title": "MACROECONOMIC CONTEXT",
+      "subtitle": "Iran docks ships; energy security and West Asia volatility"
+    },
+    {
+      "scene_number": 2,
+      "section": "MACROECONOMIC",
+      "scene_type": "big_number",
+      "duration_seconds": 12,
+      "audio_script": "An estimated 10 million Indians work in the Gulf, underscoring the energy and economic stakes of the region.",
+      "icon_hint": "world map",
+      "number": "1 crore",
+      "label": "Gulf-based Indian workforce"
+    },
+    {
+      "scene_number": 3,
+      "section": "MACROECONOMIC",
+      "scene_type": "statement",
+      "duration_seconds": 12,
+      "audio_script": "India ties energy security to diplomacy as West Asia tensions rise.",
+      "icon_hint": "oil drop",
+      "text": "India ties energy security to diplomacy as West Asia tensions rise.",
+      "highlight_1": "Energy",
+      "highlight_2": "security"
+    },
+    {
+      "scene_number": 4,
+      "section": "MACROECONOMIC",
+      "scene_type": "comparison",
+      "duration_seconds": 12,
+      "audio_script": "Before: heavy reliance on Middle East energy; After: diversified sourcing and proactive advisories.",
+      "icon_hint": "globe",
+      "title": "Energy sourcing: before vs after",
+      "left_label": "Before",
+      "left_value": "Heavy reliance on Middle East energy",
+      "left_highlight": "reliance",
+      "right_label": "After",
+      "right_value": "Diversified sourcing and advisories",
+      "right_highlight": "diversified"
+    },
+    {
+      "scene_number": 5,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "steps",
+      "duration_seconds": 12,
+      "audio_script": "GE Aerospace commits another $1 billion in 2026, expanding sites across 30+ communities in 17 states, hiring 5,000 workers, and boosting defense engine output.",
+      "icon_hint": "factory building",
+      "title": "GE Aerospace investment rollout",
+      "step_1": "Announce $1B investment",
+      "step_2": "Expand sites in 30+ communities across 17 states",
+      "step_3": "Hire 5,000 workers in 2026",
+      "step_4": "Boost defense engine production"
+    },
+    {
+      "scene_number": 6,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "key_point",
+      "duration_seconds": 12,
+      "audio_script": "Airbus Bengaluru centre: largest outside Europe, reinforcing Make in India and global value chains; sourcing exceeds $2B.",
+      "icon_hint": "tech center",
+      "heading": "Airbus Bengaluru impact",
+      "point_1": "Largest engineering hub outside Europe",
+      "point_2": "Make in India acceleration",
+      "point_3": "Sourcing > $2B"
+    },
+    {
+      "scene_number": 7,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "comparison",
+      "duration_seconds": 12,
+      "audio_script": "Embraer eyes an Indian E175 line with 200-order threshold; deliveries could start by 2028.",
+      "icon_hint": "jet",
+      "title": "Embraer India assembly plan",
+      "left_label": "Orders threshold",
+      "left_value": "200 aircraft",
+      "left_highlight": "200",
+      "right_label": "Deliveries",
+      "right_value": "by 2028",
+      "right_highlight": "2028"
+    },
+    {
+      "scene_number": 8,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "statement",
+      "duration_seconds": 12,
+      "audio_script": "Goyal highlights India's startup surge in defence and space, driven by MSMEs and Make in India.",
+      "icon_hint": "rocket",
+      "text": "India’s startup ecosystem is rising in defence and space, powered by MSMEs and Make in India.",
+      "highlight_1": "startup",
+      "highlight_2": "MSMEs"
+    },
+    {
+      "scene_number": 9,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "big_number",
+      "duration_seconds": 12,
+      "audio_script": "India accounted for 8.2% of global arms imports in 2021–25, reflecting a shift toward Western suppliers.",
+      "icon_hint": "shield badge",
+      "number": "8.2%",
+      "label": "India's share of global arms imports, 2021–25"
+    },
+    {
+      "scene_number": 10,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "steps",
+      "duration_seconds": 12,
+      "audio_script": "Raisina Dialogue urges building an indigenous industrial base and co-development to keep pace with tech shifts.",
+      "icon_hint": "factory",
+      "title": "Industrial base and co-development",
+      "step_1": "Build indigenous base",
+      "step_2": "Co-develop with partners",
+      "step_3": "Co-produce and co-supply",
+      "step_4": "Surge capacity when needed"
+    },
+    {
+      "scene_number": 11,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "statement",
+      "duration_seconds": 12,
+      "audio_script": "FWDA tests India's first autonomous swarm interceptor YAMA for cost-effective, scalable air defense.",
+      "icon_hint": "drones",
+      "text": "FWDA tests India's first autonomous swarm interceptor YAMA for cost-effective, scalable air defense.",
+      "highlight_1": "autonomous",
+      "highlight_2": "cost-effective"
+    },
+    {
+      "scene_number": 12,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "big_number",
+      "duration_seconds": 12,
+      "audio_script": "Trump calls for a 4x surge in US defense output to back West Asia operations.",
+      "icon_hint": "factory",
+      "number": "4x",
+      "label": "Proposed production surge by primes"
+    },
+    {
+      "scene_number": 13,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "statement",
+      "duration_seconds": 12,
+      "audio_script": "ADA validates AMCA intake: 98% pressure recovery and stable flow at 60-degree AoA.",
+      "icon_hint": "intake duct",
+      "text": "ADA validates AMCA intake: 98% pressure recovery and stable flow at 60-degree AoA.",
+      "highlight_1": "98% pressure recovery",
+      "highlight_2": "60-degree AoA"
+    },
+    {
+      "scene_number": 14,
+      "section": "COMPETITOR ANALYSIS",
+      "scene_type": "statement",
+      "duration_seconds": 12,
+      "audio_script": "13-ton Ghatak UCAV cleared for development to become IAF’s stealth strike asset.",
+      "icon_hint": "military aircraft",
+      "text": "13-ton Ghatak UCAV gains development clearance to become the IAF’s stealth strike asset.",
+      "highlight_1": "Ghatak",
+      "highlight_2": "stealth"
+    }
+  ]
+}

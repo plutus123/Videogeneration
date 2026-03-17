@@ -45,7 +45,7 @@ def generate_scene_image(prompt, output_path, style="", model=None, max_retries=
                 model=deployment,
                 prompt=full_prompt,
                 n=1,
-                size="1024x1024",
+                size="1920x1080",
                 timeout=120,
             )
 
@@ -72,6 +72,48 @@ def generate_scene_image(prompt, output_path, style="", model=None, max_retries=
                 time.sleep(wait)
 
     raise RuntimeError(f"Image generation failed after {max_retries} attempts: {last_err}")
+
+
+def generate_icon(subject, output_path, model=None, max_retries=3):
+    prompt = (
+        f"Simple minimalist flat icon illustration of {subject}. "
+        "Clean white background, no text, no people, no faces, single small object, "
+        "corporate line art style, 2D vector-like, thin clean outlines, "
+        "pastel pink and gray color accents, suitable as a small decorative element."
+    )
+    client = get_azure_client()
+    deployment = model or get_image_deployment()
+    last_err = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = client.images.generate(
+                model=deployment,
+                prompt=prompt,
+                n=1,
+                size="1024x1024",
+                timeout=120,
+            )
+            img = response.data[0]
+            if hasattr(img, "b64_json") and img.b64_json:
+                image_bytes = base64.b64decode(img.b64_json)
+            elif hasattr(img, "url") and img.url:
+                with urllib.request.urlopen(img.url, timeout=60) as resp:
+                    image_bytes = resp.read()
+            else:
+                raise RuntimeError("No image data in response")
+            os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+            with open(output_path, "wb") as f:
+                f.write(image_bytes)
+            return output_path
+        except Exception as e:
+            last_err = e
+            if attempt < max_retries:
+                import time
+                wait = 5 * attempt
+                print(f"    Icon retry {attempt}/{max_retries}: {str(e)[:60]}... waiting {wait}s")
+                time.sleep(wait)
+    print(f"    Icon generation failed: {last_err}")
+    return None
 
 
 def add_text_overlay(image_path, text, output_path=None):
