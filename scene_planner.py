@@ -28,7 +28,7 @@ NARRATION RULES:
 - Focus strictly on competitive intelligence, significant strategic moves, supply chain resilience, and capacity scaling.
 - The audio_script of the VERY FIRST scene of each section MUST begin using these exact specific intro styles:
     * Macroeconomic: "Macroeconomic Context: ..."
-    * Civil: "Civil Aviation Competitors: ..."
+    * Civil: "Civil Aviation Update: ..."
     * Defence: "Defence Sector Initiatives: ..."
     * PowerSystems: "Power Systems Network: ..."
     * SMR/ Nuclear: "SMR and Nuclear Developments: ..."
@@ -92,7 +92,7 @@ NARRATION RULES:
 - Focus strictly on competitive intelligence, significant strategic moves, supply chain resilience, and capacity scaling.
 - The audio_script of the VERY FIRST scene of each section MUST begin using these exact specific intro styles:
     * Macroeconomic: "Macroeconomic Context: ..."
-    * Civil: "Civil Aviation Competitors: ..."
+    * Civil: "Civil Aviation Update: ..."
     * Defence: "Defence Sector Initiatives: ..."
     * PowerSystems: "Power Systems Network: ..."
     * SMR/ Nuclear: "SMR and Nuclear Developments: ..."
@@ -143,7 +143,7 @@ Every visual_prompt MUST begin with: " briefing infographic,dossier style, horiz
 TEXT REQUIREMENT: Every visual_prompt MUST explicitly command the image generator to render the exact SECTION NAME prominently in clean, bold, typography at the very top edge of the image.
 
 For each scene you MUST also provide these structured fields:
-- "category_label": ALL-CAPS topic label (e.g. "GEOPOLITICAL UPDATE", "COMPETITOR ALERT", "MARKET SHIFT", "DEFENSE INTEL", "TECH BREAKTHROUGH")
+- "category_label": ALL-CAPS topic label (e.g. "GEOPOLITICAL UPDATE", "INDUSTRY UPDATE", "MARKET SHIFT", "DEFENSE INTEL", "TECH BREAKTHROUGH")
 - "headline_stat": the single most impactful number or short phrase for the large stat display (e.g. "$1B", "8.2%", "98%", "13-TON")
 - "headline_caption": a short caption below the stat (e.g. "GE Aerospace U.S. Investment")
 - "icon_type": one of: jet, ship, factory, shield, chart, globe, drone, rocket
