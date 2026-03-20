@@ -26,7 +26,7 @@ Generates cinematic narrated videos from news URLs or a pre-built JSON scene pla
 python main.py urls_config.json --from-urls
 
 # From pre-built scene JSON
-python main.py example_input.json
+python main.py generated_scene_plan.json
 
 # Just generate the scene plan (no video)
 python main.py urls_config.json --from-urls --plan-only
@@ -71,3 +71,8 @@ Output: `assets/outputs/final_video.mp4`
   "overall_style": "Cinematic documentary style with warm lighting."
 }
 ```
+
+# Issues to fix 
+Fix the audio issue. 
+Remove Competitor Analysis for the visuals.
+In PowerSystem news Defence news is coming up check that[p]
