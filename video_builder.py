@@ -4,8 +4,8 @@ import os
 from moviepy import ImageClip, AudioFileClip, concatenate_videoclips, vfx
 from mutagen.mp3 import MP3
 
-VIDEO_WIDTH = 1920
-VIDEO_HEIGHT = 1080
+VIDEO_WIDTH = 1536
+VIDEO_HEIGHT = 1024
 FPS = 30
 
 
