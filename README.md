@@ -1,84 +1,78 @@
-# Vizh -- Presentation Video Generator
+RR-Video Generator
 
-Turns a simple JSON file into a narrated, professional-looking presentation video.
+Generates cinematic narrated videos from news URLs or a pre-built JSON scene plan. Extracts content from articles, uses GPT to plan scenes, generates AI images, narrates with TTS, and assembles a polished MP4.
 
 ## How it works
 
-1. You write a JSON file describing your slides (title, text, optional equations).
-2. The tool sends each slide to **GPT-4o-mini**, which generates a Manim scene script as a backup and structured slide data.
-3. Each slide is rendered as a high-quality **HTML page** (styled with CSS gradients, glassmorphism cards, and Inter font) and captured as a 1920x1080 screenshot via a headless Chromium browser (Playwright).
-4. **Narration** is generated per-slide using GPT (context-aware so it flows naturally) and converted to audio with OpenAI TTS.
-5. The screenshots and audio files are assembled into an MP4 with crossfade transitions using MoviePy.
+### Mode 1: From URLs (full pipeline)
 
-The result is a polished 1080p video with synced voiceover, smooth transitions, and a closing "Thank You" slide -- ready for a meeting or presentation.
+1. Provide a `urls_config.json` with categorized article URLs.
+2. Articles are fetched and text extracted (with fallback summaries for blocked sites).
+3. GPT generates a scene-by-scene video plan from the extracted content.
+4. Each scene's image is generated via the **GPT image model**, with `on_screen_text` overlaid via Pillow.
+5. **Narration audio** is generated from each scene's `audio_script` using OpenAI TTS.
+6. Images and audio are assembled into an MP4 with crossfade transitions using MoviePy.
+
+### Mode 2: From scene JSON (direct)
+
+1. Provide a pre-built scene JSON (like `example_input.json`).
+2. Steps 4-6 above run directly.
 
 ## Quick start
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
 
-# Install Playwright's bundled browser
-playwright install chromium
+# From URLs (extract + plan + generate video)
+python main.py urls_config.json --from-urls
 
-# Set your OpenAI key
-echo "OPENAI_API_KEY=sk-..." > .env
+# From pre-built scene JSON
+python main.py generated_scene_plan.json
 
-# Generate the video
-python main.py example_input.json
+# Just generate the scene plan (no video)
+python main.py urls_config.json --from-urls --plan-only
 ```
 
-The final video lands in `assets/outputs/final_video.mp4`.
+Output: `assets/outputs/final_video.mp4`
 
-## Input format
+## URLs config format
 
 ```json
 {
-  "title": "How Rockets Reach Orbit",
-  "scenes": [
-    { "title": "Introduction", "text": "Rockets allow spacecraft to escape Earth's gravity.", "animation": "title" },
-    { "title": "Newton's Third Law", "text": "Gas goes down, rocket goes up.", "equation": "F = \\dot{m} \\times v_e" },
-    { "title": "Orbital Velocity", "text": "7.8 km/s to stay in LEO.", "equation": "v = \\sqrt{GM/r}" }
-  ]
+  "section_mapping": {
+    "Macroeconomic": ["Macroeconomic"],
+    "Competitors": ["Civil", "Defence", "PowerSystems"]
+  },
+  "categories": {
+    "Civil": [
+      {
+        "url": "https://example.com/article",
+        "title": "Article Title",
+        "fallback_summary": "Used if the URL cannot be fetched."
+      }
+    ]
+  }
 }
 ```
 
-Each object in `scenes` becomes one slide. The first scene is treated as the title slide. A "Thank You" closing slide is appended automatically.
+## Scene JSON format
 
-## CLI options
-
-```
-python main.py INPUT_JSON [--skip-generation] [--no-tts] [--output-dir DIR] [--scenes-dir DIR]
-```
-
-- `--skip-generation` -- reuse previously generated slide data and narration (skip GPT calls).
-- `--no-tts` -- produce a silent video (no narration).
-- `--output-dir` -- where to write the final video (default `assets/outputs`).
-- `--scenes-dir` -- where generated scene files live (default `generated_scenes`).
-
-## Project layout
-
-```
-main.py              Entry point -- orchestrates the four pipeline steps
-gpt_formatter.py     Calls GPT to produce Manim scripts + slide JSON + narration
-slide_renderer.py    HTML/CSS slide templates, Playwright capture, MoviePy video assembly
-utils/
-  tts_utils.py       Narration text generation (GPT) and text-to-speech (OpenAI / gTTS)
-assets/
-  narration/         Generated .mp3 and .txt narration files
-  slide_images/      Captured slide screenshots
-  outputs/           Final video
-generated_scenes/    GPT-generated Manim .py files and slide .json metadata
+```json
+{
+  "textual_summary": "A brief overview of the video content.",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "duration_seconds": 8,
+      "visual_prompt": "A cinematic aerial shot of...",
+      "audio_script": "Narration text spoken during this scene.",
+      "on_screen_text": "Headline text overlaid on the image"
+    }
+  ],
+  "overall_style": "Cinematic documentary style with warm lighting."
+}
 ```
 
-## Requirements
-
-- Python 3.10+
-- An OpenAI API key (for GPT and TTS)
-- ffmpeg (for video encoding)
-
-## License
-
-MIT
-
+# Issues to fix 
+Fix the audio issue. 
+Remove Competitor Analysis for the visuals.
+In PowerSystem news Defence news is coming up check that[p]
