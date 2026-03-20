@@ -1,36 +1,101 @@
 {
   "section_mapping": {
     "Macroeconomic": {
-      "categories": ["Macroeconomic"],
-      "narration_hint": "Set the geopolitical and macroeconomic context."
+      "categories": [
+        "Macroeconomic"
+      ]
     },
-    "Competitor Analysis": {
-      "categories": ["Civil", "Defence", "PowerSystems"],
-      "narration_hint": "For competitor introduction begin with 'Our competitor...' framing. Analyse what global and domestic competitors are doing in civil aviation, defence, and power systems sectors. Highlight their investments, capabilities, and strategic moves."
+    "Civil": {
+      "categories": [
+        "Civil"
+      ]
+    },
+    "Defence": {
+      "categories": [
+        "Defence"
+      ]
+    },
+    "PowerSystems": {
+      "categories": [
+        "PowerSystems"
+      ]
+    },
+    "SMR/ Nuclear": {
+      "categories": [
+        "SMR/ Nuclear"
+      ]
     }
   },
   "categories": {
     "Macroeconomic": [
-      {"url": "https://defence.in/threads/iran-sought-permission-for-docking-of-3-ships-in-indian-ports-approval-granted-eam-jaishankar.17120/"}
+      {
+        "url": "https://defence.in/threads/iran-sought-permission-for-docking-of-3-ships-in-indian-ports-approval-granted-eam-jaishankar.17120/"
+      },
+      {
+        "url": "https://www.aljazeera.com/news/2026/3/14/two-indian-ships-cross-strait-of-hormuz-as-iran-says-it-allowed-passage"
+      },
+      {
+        "url": "https://m.economictimes.com/news/economy/foreign-trade/eu-india-focus-on-implementing-fta-defence-deal-ursula-von-der-leyen/amp_articleshow/129613618.cms"
+      }
     ],
     "Civil": [
-      {"url": "https://www.geaerospace.com/news/articles/ge-aerospace-invest-another-1b-us-manufacturing"},
-      {"url": "https://www.manufacturingtodayindia.com/airbus-5000-seater-tech-centre"},
-      {"url": "https://www.business-standard.com/industry/aviation/indian-airlines-cancel-279-international-flights-amid-west-asia-crisis-126030800778_1.html"},
-      {"url": "https://defence.in/threads/embraer-proposes-indian-assembly-line-for-e175-jets-by-2028-conditional-on-securing-at-least-200-orders.17121/"}
+      {
+        "url": "https://www.geaerospace.com/news/articles/ge-aerospace-invest-another-1b-us-manufacturing"
+      },
+      {
+        "url": "https://www.manufacturingtodayindia.com/airbus-5000-seater-tech-centre"
+      },
+      {
+        "url": "https://defence.in/threads/embraer-proposes-indian-assembly-line-for-e175-jets-by-2028-conditional-on-securing-at-least-200-orders.17121/"
+      },
+      {
+        "url": "https://www.storyboard18.com/trending/west-asia-conflict-disrupts-aviation-over-5500-flights-cancelled-says-minister-92353.htm"
+      }
     ],
     "Defence": [
-      {"url": "https://www.newsonair.gov.in/union-minister-piyush-goyal-highlights-the-rapid-rise-of-indias-startup-ecosystem-in-defence-space-sectors/"},
-      {"url": "https://economictimes.indiatimes.com/news/defence/india-was-worlds-2nd-largest-importer-of-arms-in-202125-accounted-for-8-2-of-global-arms-receipts-think-tank-says/articleshow/129313577.cms"},
-      {"url": "https://www.business-standard.com/blueprint-defence-magazine/insights/decoding-a-decade-long-transformation-of-indias-defence-sector"},
-      {"url": "https://economictimes.indiatimes.com/news/defence/amid-conflicts-countries-will-have-to-build-their-industrial-complex-upgrade-tech-navy-chief/articleshow/129168214.cms"},
-      {"url": "https://www.fortuneindia.com/amp/story/business-news/bengaluru-ai-warfare-defence-startup-tests-indias-first-autonomous-swarm-interceptor/130994"},
-      {"url": "https://www.deccanherald.com/world/us/west-asia-conflict-us-president-donald-trump-asks-defence-contractors-to-quadruple-production-3922886"},
-      {"url": "https://defence.in/threads/ada-validates-advanced-intake-aerodynamics-for-amca-research-achieves-98-pressure-recovery-for-stealth-aircraft.17110/"},
-      {"url": "https://defence.in/threads/13-ton-ghatak-ucav-receives-critical-development-clearance-poised-to-become-iafs-primary-stealth-strike-platform.17118/"}
+      {
+        "url": "https://www.thehindu.com/news/national/india-pitches-to-join-future-combat-air-system-with-france/article70696418.ece"
+      },
+      {
+        "url": "https://defence.in/threads/ada-validates-advanced-intake-aerodynamics-for-amca-research-achieves-98-pressure-recovery-for-stealth-aircraft.17110/"
+      },
+      {
+        "url": "https://economictimes.indiatimes.com/news/defence/india-investing-in-next-gen-tech-transforming-how-defence-solutions-are-conceived-rajnath-singh/articleshow/129612825.cms?utm_source=contentofinterest&utm_medium=text&utm_campaign=cppst"
+      },
+      {
+        "url": "https://economictimes.indiatimes.com/news/defence/india-was-worlds-2nd-largest-importer-of-arms-in-202125-accounted-for-8-2-of-global-arms-receipts-think-tank-says/articleshow/129313577.cms?utm_source=contentofinterest&utm_medium=text&utm_campaign=cppst"
+      },
+      {
+        "url": "https://timesofindia.indiatimes.com/city/ahmedabad/gujarat-to-form-spv-for-defence-testing-industry-linkages/articleshow/129617287.cms"
+      },
+      {
+        "url": "https://defence.in/threads/13-ton-ghatak-ucav-receives-critical-development-clearance-poised-to-become-iafs-primary-stealth-strike-platform.17118/"
+      },
+      {
+        "url": "https://www.newsonair.gov.in/union-minister-piyush-goyal-highlights-the-rapid-rise-of-indias-startup-ecosystem-in-defence-space-sectors/"
+      },
+      {
+        "url": "https://economictimes.indiatimes.com/news/defence/amid-conflicts-countries-will-have-to-build-their-industrial-complex-upgrade-tech-navy-chief/articleshow/129168214.cms?utm_source=contentofinterest&utm_medium=text&utm_campaign=cppst"
+      },
+      {
+        "url": "https://www.deccanherald.com/world/us/west-asia-conflict-us-president-donald-trump-asks-defence-contractors-to-quadruple-production-3922886"
+      }
     ],
     "PowerSystems": [
-      {"url": "https://www.business-standard.com/companies/news/tvs-supply-chain-strengthens-caterpillars-global-supply-chains-from-india"}
+      {
+        "url": "https://www.business-standard.com/companies/news/tvs-supply-chain-strengthens-caterpillar-s-global-network-from-india-126031001442_1.html"
+      }
+    ],
+    "SMR/ Nuclear": [
+      {
+        "url": "https://indianexpress.com/article/explained/explained-sci-tech/expert-explains-thorium-india-100-gwe-2047-10564911/"
+      },
+      {
+        "url": "https://visionias.in/current-affairs/upsc-daily-news-summary/article/2026-03-16/the-indian-express/economy/how-thorium-can-power-indias-100-gwe-by-2047-mission"
+      },
+      {
+        "url": "https://www.pib.gov.in/PressReleseDetailm.aspx?PRID=2205825&reg=3&lang=1"
+      }
     ]
   }
 }
