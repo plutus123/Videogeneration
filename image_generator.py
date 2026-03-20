@@ -5,20 +5,37 @@ import urllib.request
 from PIL import Image, ImageDraw, ImageFont
 from utils.azure_client import get_azure_client, get_image_deployment
 
-if sys.platform == "win32":
-    FONT_PATHS = [
-        "C:\\Windows\\Fonts\\arial.ttf",
-        "C:\\Windows\\Fonts\\segoeui.ttf",
-        "C:\\Windows\\Fonts\\calibri.ttf",
-        "C:\\Windows\\Fonts\\verdana.ttf",
-    ]
-else:
-    FONT_PATHS = [
-        "/System/Library/Fonts/Helvetica.ttc",
-        "/System/Library/Fonts/SFNSDisplay.ttf",
-        "/Library/Fonts/Arial Unicode.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-    ]
+
+FONT_PATHS = [
+    "C:\\Windows\\Fonts\\arial.ttf",
+    "C:\\Windows\\Fonts\\segoeui.ttf",
+    "C:\\Windows\\Fonts\\calibri.ttf",
+    "C:\\Windows\\Fonts\\verdana.ttf",
+]
+
+# ---------------------------------------------------------------------------
+# Style preamble prepended to every visual_prompt in infographic mode.
+# Reinforces the aesthetic rules for the image-generation model.
+# ---------------------------------------------------------------------------
+DOSSIER_STYLE_PREAMBLE = (
+   
+    "dossier aesthetic, horizontal/landscape orientation. "
+    "BACKGROUND: Off-white/cream parchment (#F2EDE0), subtle grid overlay at low "
+    "opacity, technical crosshair marks (+) in corners. "
+    "TYPOGRAPHY: Headlines bold dark navy (#1A2744) sans-serif, body text in "
+    "monospace dark charcoal, labels in ALL-CAPS monospace letter-spaced, "
+    "accent subheadings steel blue (#4A90B8). "
+    "COLOR PALETTE (strict): dark navy #1A2744, burnt orange #C0622A, "
+    "steel blue #4A8FB5, olive green #6B7A45, cream #F2EDE0. "
+    "LAYOUT: clean ruled border, 2-4 card regions with thin borders, "
+    "bold key stat or flat technical icon (large) with monospace bullet points, "
+    "flat blueprint-like iconography only. "
+    "MOOD:  financial research. "
+    "Serious, structured, data-dense, visually clean. "
+    "NO gradients. NO photos. NO photorealism. NO watermarks. "
+    "Flat technical illustration ONLY. "
+    "\n\n"
+)
 
 
 def _load_font(size=40):
@@ -31,12 +48,29 @@ def _load_font(size=40):
     return ImageFont.load_default()
 
 
-def generate_scene_image(prompt, output_path, style="", model=None, max_retries=3):
+def generate_scene_image(prompt, output_path, style="", model=None,
+                         max_retries=3, visual_style="photo"):
+    """Generate a scene image via Azure OpenAI.
+
+    Args:
+        prompt:       The visual_prompt text from the scene plan.
+        output_path:  Where to save the generated image.
+        style:        The overall_style string from the scene plan (appended).
+        model:        Override image deployment name.
+        max_retries:  Number of retry attempts.
+        visual_style: "photo" or "infographic" — controls preamble injection.
+    """
     client = get_azure_client()
     deployment = model or get_image_deployment()
-    full_prompt = prompt
+
+    # Build the full prompt
+    if visual_style == "infographic":
+        full_prompt = DOSSIER_STYLE_PREAMBLE + prompt
+    else:
+        full_prompt = prompt
+
     if style:
-        full_prompt = f"{prompt}\n\nOverall visual style: {style}"
+        full_prompt = f"{full_prompt}\n\nOverall visual style: {style}"
 
     last_err = None
     for attempt in range(1, max_retries + 1):
@@ -45,7 +79,7 @@ def generate_scene_image(prompt, output_path, style="", model=None, max_retries=
                 model=deployment,
                 prompt=full_prompt,
                 n=1,
-                size="1024x1024",
+                size="1536x1024",
                 timeout=120,
             )
 
@@ -59,8 +93,18 @@ def generate_scene_image(prompt, output_path, style="", model=None, max_retries=
                 raise RuntimeError("Azure image response has neither b64_json nor url")
 
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            with open(output_path, "wb") as f:
-                f.write(image_bytes)
+            
+            import io
+            img_pil = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+            
+            if visual_style == "infographic":
+                # Save the image natively since it matches target aspect ratio
+                img_pil = img_pil.resize((1536, 1024), Image.Resampling.LANCZOS)
+                img_pil.save(output_path, quality=95)
+            else:
+                # Direct crop from center if preserving aspect ratio is needed, but assuming full fit
+                img_cropped = img_pil.resize((1536, 1024), Image.Resampling.LANCZOS)
+                img_cropped.save(output_path, quality=95)
 
             return output_path
         except Exception as e:
