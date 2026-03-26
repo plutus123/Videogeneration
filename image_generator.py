@@ -1,5 +1,6 @@
 import os
-import sys
+import io
+import time
 import base64
 import urllib.request
 from PIL import Image, ImageDraw, ImageFont
@@ -93,24 +94,14 @@ def generate_scene_image(prompt, output_path, style="", model=None,
                 raise RuntimeError("Azure image response has neither b64_json nor url")
 
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            
-            import io
             img_pil = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-            
-            if visual_style == "infographic":
-                # Save the image natively since it matches target aspect ratio
-                img_pil = img_pil.resize((1536, 1024), Image.Resampling.LANCZOS)
-                img_pil.save(output_path, quality=95)
-            else:
-                # Direct crop from center if preserving aspect ratio is needed, but assuming full fit
-                img_cropped = img_pil.resize((1536, 1024), Image.Resampling.LANCZOS)
-                img_cropped.save(output_path, quality=95)
+            img_pil = img_pil.resize((1536, 1024), Image.Resampling.LANCZOS)
+            img_pil.save(output_path, quality=95)
 
             return output_path
         except Exception as e:
             last_err = e
             if attempt < max_retries:
-                import time
                 wait = 5 * attempt
                 print(f"    Retry {attempt}/{max_retries} after error: {str(e)[:80]}... waiting {wait}s")
                 time.sleep(wait)

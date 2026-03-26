@@ -1,0 +1,73 @@
+{
+  "briefing_date": "w/c 23 Mar",
+  "textual_summary": "Weekly Rolls-Royce intelligence briefing (w/c 23 Mar) covering company updates, market impact, and competitive landscape.",
+  "scenes": [
+    {
+      "slide_number": 1,
+      "question": "What's happening in Rolls-Royce?",
+      "category_label": "ROLLS-ROYCE UPDATE",
+      "headline_stat": "Open-fan testing ahead of 2027 trials",
+      "headline_caption": "Safran open-fan milestone reshapes propulsion",
+      "icon_type": "jet",
+      "bullet_points": [
+        "Open-fan front module testing advanced; ground trials planned by 2027",
+        "Core element could reshape propulsion architecture",
+        "Strategic implication: accelerate propulsion roadmap and partnerships"
+      ],
+      "source_label": "Source: flightglobal.com | w/c 16 Mar",
+      "accent_color": "blue",
+      "audio_script": "Safran advances open-fan front module testing, targeting 2027 ground trials. This core element could reshape propulsion architecture, pressuring Rolls-Royce to accelerate adaptable core and partnerships to stay competitive.",
+      "duration_seconds": 12.0,
+      "scene_number": 1,
+      "section": "What's happening in Rolls-Royce?",
+      "article_source": "",
+      "visual_prompt": "briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). Render 'ROLLS-ROYCE UPDATE' prominently at the top edge in bold dark navy typography. Center-left: large bold 'Open-fan testing ahead of 2027 trials' with flat jet icon. Center-right: monospace bullet points: Open-fan front module testing advanced; ground trials planned by 2027; Core element could reshape propulsion architecture; Strategic implication: accelerate propulsion roadmap and partnerships. Bottom strip: Source: flightglobal.com | w/c 16 Mar. ONLY show exact data listed above. Do NOT invent any numbers.",
+      "on_screen_text": "Open-fan testing ahead of 2027 trials"
+    },
+    {
+      "slide_number": 2,
+      "question": "How is it affecting the market?",
+      "category_label": "MARKET IMPACT",
+      "headline_stat": "DOT&E flags persistent US Navy aviation challenges",
+      "headline_caption": "US Navy program headwinds impact propulsion market",
+      "icon_type": "chart",
+      "bullet_points": [
+        "DOT&E cites persistent challenges across US Navy aviation programs",
+        "Impacts on budgets, schedules, modernization timelines",
+        "Strategic implication: tighter budgets may slow RR propulsion program funding"
+      ],
+      "source_label": "Source: flightglobal.com | w/c 16 Mar",
+      "accent_color": "orange",
+      "audio_script": "DOT&E flags persistent challenges across US Navy aviation programs, risking cost growth and schedule slips. That pressure could constrain modernization pipelines for buyers of RR propulsion, delaying upgrades or new engine programs.",
+      "duration_seconds": 12.0,
+      "scene_number": 2,
+      "section": "How is it affecting the market?",
+      "article_source": "",
+      "visual_prompt": "briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). Render 'MARKET IMPACT' prominently at the top edge in bold dark navy typography. Center-left: large bold 'DOT&E flags persistent US Navy aviation challenges' with flat chart icon. Center-right: monospace bullet points: DOT&E cites persistent challenges across US Navy aviation programs; Impacts on budgets, schedules, modernization timelines; Strategic implication: tighter budgets may slow RR propulsion program funding. Bottom strip: Source: flightglobal.com | w/c 16 Mar. ONLY show exact data listed above. Do NOT invent any numbers.",
+      "on_screen_text": "DOT&E flags persistent US Navy aviation challenges"
+    },
+    {
+      "slide_number": 3,
+      "question": "How is the competition doing?",
+      "category_label": "COMPETITIVE LANDSCAPE",
+      "headline_stat": "First upgraded RM12EP engine delivered to Gripen C/D",
+      "headline_caption": "Gripen upgrade milestone tightens RR competitive gap",
+      "icon_type": "shield",
+      "bullet_points": [
+        "Sweden Air Force receives first upgraded RM12EP engine for Gripen C/D",
+        "Upgrade targets propulsion reliability and performance",
+        "Strategic implication: establishes pressure to match RR modernization pace"
+      ],
+      "source_label": "Source: flightglobal.com | w/c 16 Mar",
+      "accent_color": "green",
+      "audio_script": "Sweden delivers the first upgraded RM12EP engine for the Gripen C/D, boosting reliability and performance. The upgrade sets a benchmark for propulsion improvements, pressuring RR to accelerate comparable competitiveness in modern jets.",
+      "duration_seconds": 12.0,
+      "scene_number": 3,
+      "section": "How is the competition doing?",
+      "article_source": "",
+      "visual_prompt": "briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). Render 'COMPETITIVE LANDSCAPE' prominently at the top edge in bold dark navy typography. Center-left: large bold 'First upgraded RM12EP engine delivered to Gripen C/D' with flat shield icon. Center-right: monospace bullet points: Sweden Air Force receives first upgraded RM12EP engine for Gripen C/D; Upgrade targets propulsion reliability and performance; Strategic implication: establishes pressure to match RR modernization pace. Bottom strip: Source: flightglobal.com | w/c 16 Mar. ONLY show exact data listed above. Do NOT invent any numbers.",
+      "on_screen_text": "First upgraded RM12EP engine delivered to Gripen C/D"
+    }
+  ],
+  "overall_style": "flat infographic, technical illustration"
+}

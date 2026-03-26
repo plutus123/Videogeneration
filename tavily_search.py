@@ -2,7 +2,8 @@
 
 import os
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -102,6 +103,7 @@ def search_aviation_news(
             response = client.search(
                 query=query,
                 search_depth="advanced",
+                topic="news",
                 max_results=max_results_per_query,
                 include_domains=whitelist,
                 days=days_back,
@@ -113,6 +115,7 @@ def search_aviation_news(
                 if url in seen_urls:
                     continue
                 seen_urls.add(url)
+                domain = urlparse(url).netloc.replace("www.", "")
                 all_results.append({
                     "url": url,
                     "title": r.get("title", ""),
@@ -120,6 +123,7 @@ def search_aviation_news(
                     "raw_content": r.get("raw_content", ""),
                     "score": r.get("score", 0),
                     "published_date": r.get("published_date", ""),
+                    "domain": domain,
                 })
             print(f"    Found {len(results)} results ({len(seen_urls)} unique total)")
         except Exception as e:
@@ -145,7 +149,6 @@ def search_aviation_news(
 
 def load_whitelist_from_config(config_path="urls_config.json"):
     """Extract unique domains from urls_config.json to build whitelist."""
-    from urllib.parse import urlparse
     domains = set(DEFAULT_WHITELIST)
     try:
         with open(config_path) as f:

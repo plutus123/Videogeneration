@@ -157,7 +157,6 @@ def fetch_article(url: str, timeout: int = 30) -> dict | None:
     except Exception as e:
         print(f"    ERROR: {type(e).__name__}: {e}")
         return None
-    return None
 
 
 def _summarize_article(title: str, content: str, category: str) -> str:
@@ -250,12 +249,6 @@ def _resolve_categories(section_cfg):
     if isinstance(section_cfg, list):
         return section_cfg, ""
     return section_cfg.get("categories", []), section_cfg.get("narration_hint", "")
-
-
-def load_extracted_content(path: str = "extracted_content.json"):
-    with open(path) as f:
-        data = json.load(f)
-    return data["articles"], data["section_mapping"]
 
 
 def build_context(fetched_data: dict, section_mapping: dict) -> str:

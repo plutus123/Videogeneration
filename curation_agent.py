@@ -10,6 +10,7 @@ Each question becomes one slide in the final 30-40 second video.
 
 import json
 import os
+from datetime import datetime, timedelta
 from utils.azure_client import get_azure_client, get_chat_deployment
 
 
@@ -69,6 +70,7 @@ RULES:
 - The audio_script for each slide should be 25-33 words (10-13 seconds at 2.5 words/sec).
 - The audio_script MUST directly elaborate on the bullet points shown on screen. No unrelated tangents.
 - Total video: 30-40 seconds STRICT.
+- For source_label use format: "Source: domain.com | w/c DD Mon" using the week-commencing Monday date.
 
 OUTPUT valid JSON ONLY:
 {
@@ -206,6 +208,11 @@ def generate_briefing_summary(curated_articles, save_path="generated_scene_plan.
     )
     plan = json.loads(response.choices[0].message.content)
 
+    # Compute week-commencing date (Monday of current week)
+    today = datetime.now()
+    monday = today - timedelta(days=today.weekday())
+    wc_label = monday.strftime("w/c %d %b")
+
     # Add visual_prompt and on_screen_text to each slide for compatibility
     # with the existing image generation and video pipeline
     for slide in plan.get("slides", []):
@@ -220,6 +227,14 @@ def generate_briefing_summary(curated_articles, save_path="generated_scene_plan.
         icon = slide.get("icon_type", "chart")
         bullets_text = "; ".join(bullets)
 
+        # Ensure source_label includes w/c date
+        src = slide.get("source_label", "")
+        if src and "w/c" not in src:
+            src = src.rstrip().rstrip("|").rstrip() + f" | {wc_label}"
+            slide["source_label"] = src
+        elif not src:
+            slide["source_label"] = f"Source: Tavily Search | {wc_label}"
+
         slide["visual_prompt"] = (
             f"briefing infographic, dossier style, horizontal landscape layout, "
             f"cream parchment background (#F2EDE0). "
@@ -233,7 +248,8 @@ def generate_briefing_summary(curated_articles, save_path="generated_scene_plan.
 
     # Wrap in scene plan format
     scene_plan = {
-        "textual_summary": f"Weekly Rolls-Royce intelligence briefing covering company updates, market impact, and competitive landscape.",
+        "briefing_date": wc_label,
+        "textual_summary": f"Weekly Rolls-Royce intelligence briefing ({wc_label}) covering company updates, market impact, and competitive landscape.",
         "scenes": plan.get("slides", []),
         "overall_style": plan.get("overall_style", "flat infographic, technical illustration"),
     }

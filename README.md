@@ -1,78 +1,60 @@
 RR-Video Generator
 
-Generates cinematic narrated videos from news URLs or a pre-built JSON scene plan. Extracts content from articles, uses GPT to plan scenes, generates AI images, narrates with TTS, and assembles a polished MP4.
+Generates narrated intelligence briefing videos from news articles. Uses Azure OpenAI for scene planning, image generation, and TTS narration. Outputs two MP4 videos (with and without voiceover).
 
-## How it works
+## Modes
 
-### Mode 1: From URLs (full pipeline)
+### Mode 1: Auto (Tavily search pipeline)
 
-1. Provide a `urls_config.json` with categorized article URLs.
-2. Articles are fetched and text extracted (with fallback summaries for blocked sites).
-3. GPT generates a scene-by-scene video plan from the extracted content.
-4. Each scene's image is generated via the **GPT image model**, with `on_screen_text` overlaid via Pillow.
-5. **Narration audio** is generated from each scene's `audio_script` using OpenAI TTS.
-6. Images and audio are assembled into an MP4 with crossfade transitions using MoviePy.
-
-### Mode 2: From scene JSON (direct)
-
-1. Provide a pre-built scene JSON (like `example_input.json`).
-2. Steps 4-6 above run directly.
-
-## Quick start
+Searches for aviation/defence news via Tavily, curates with GPT, generates a 3-slide weekly briefing.
 
 ```bash
-
-# From URLs (extract + plan + generate video)
-python main.py urls_config.json --from-urls
-
-# From pre-built scene JSON
-python main.py generated_scene_plan.json
-
-# Just generate the scene plan (no video)
-python main.py urls_config.json --from-urls --plan-only
+python main.py auto
+python main.py auto --days-back 14 --plan-only
+python main.py auto --output-dir assets/runs/my_run
 ```
 
-Output: `assets/outputs/final_video.mp4`
+### Mode 2: URLs (full extraction pipeline)
 
-## URLs config format
+Extracts content from a `urls_config.json`, plans scenes via GPT, generates video.
 
-```json
-{
-  "section_mapping": {
-    "Macroeconomic": ["Macroeconomic"],
-    "Competitors": ["Civil", "Defence", "PowerSystems"]
-  },
-  "categories": {
-    "Civil": [
-      {
-        "url": "https://example.com/article",
-        "title": "Article Title",
-        "fallback_summary": "Used if the URL cannot be fetched."
-      }
-    ]
-  }
-}
+```bash
+python main.py urls urls_config.json
+python main.py urls urls_config.json --plan-only
+python main.py urls urls_config.json --version v2
 ```
 
-## Scene JSON format
+### Mode 3: Scene (from existing scene plan)
 
-```json
-{
-  "textual_summary": "A brief overview of the video content.",
-  "scenes": [
-    {
-      "scene_number": 1,
-      "duration_seconds": 8,
-      "visual_prompt": "A cinematic aerial shot of...",
-      "audio_script": "Narration text spoken during this scene.",
-      "on_screen_text": "Headline text overlaid on the image"
-    }
-  ],
-  "overall_style": "Cinematic documentary style with warm lighting."
-}
+Generates video directly from a pre-built scene plan JSON.
+
+```bash
+python main.py scene generated_scene_plan.json
+python main.py scene generated_scene_plan.json --version v2
 ```
 
-# Issues to fix 
-Fix the audio issue. 
-Remove Competitor Analysis for the visuals.
-In PowerSystem news Defence news is coming up check that[p]
+## Output
+
+All modes produce two videos in the output directory:
+- `final_with_voiceover.mp4`
+- `final_without_voiceover.mp4`
+
+## Common flags
+
+| Flag | Description |
+|------|-------------|
+| `--style photo\|infographic` | Visual style (default: infographic) |
+| `--skip-images` | Skip image generation (use cached) |
+| `--skip-audio` | Skip audio generation (use cached) |
+| `--voice` | TTS voice name (default: alloy) |
+| `--model` | Override image model deployment |
+| `--version` | Version tag for run directory |
+
+## Setup
+
+Requires a `.env` file with Azure OpenAI and Tavily API keys. See `utils/azure_client.py` for expected environment variables.
+
+```bash
+pip install -r requirements.txt
+playwright install chromium  # optional, for scraping fallback
+```
