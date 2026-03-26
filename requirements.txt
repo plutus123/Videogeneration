@@ -7,3 +7,5 @@ requests
 beautifulsoup4
 lxml
 cloudscraper
+playwright
+tavily-python

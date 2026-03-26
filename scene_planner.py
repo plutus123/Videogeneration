@@ -16,8 +16,9 @@ STRICT DURATION RULES (TTS reads at 2.5 words per second):
 SCENE NUMBERING AND DISTRIBUTION:
 - Start from scene_number 1.
 - ALL sections from the context MUST appear. No section may be skipped.
-- 1 article = 1 scene. Multiple related articles can share 1 scene.
-- Distribute proportionally: a section with 1 article gets 1 scene, a section with 8 articles gets 5-7 scenes.
+- 1 article = 1 scene. NEVER combine multiple articles into a single scene.
+- CRITICAL: If an article contains MULTIPLE distinct news items (e.g., FCAS pitch, Pinaka export, AMCA update, defense exports), create SEPARATE scenes for each distinct topic.
+- Distribute proportionally: a section with 1 article gets 1 scene, a section with 8 articles gets 8 scenes.
 - STRICT RULE: NEVER mix information across categories. A scene for a specific section MUST ONLY use facts from that section's articles. Do not hallucinate.
 
 NARRATION RULES:
@@ -47,6 +48,7 @@ VISUAL STYLE:
 - visual_prompt describes a SINGLE photorealistic corporate-style image (not video or animation).
 - Every visual_prompt MUST include: "Corporate photography style, clean professional aesthetic".
 - TEXT REQUIREMENT: Every visual_prompt MUST explicitly command the image generator to render the exact SECTION NAME prominently in clean, bold, typography at the very top edge of the image.
+- CRITICAL ANTI-HALLUCINATION RULE: visual_prompts must ONLY reference EXACT data points from the scene (headline_stat, bullet_points). NEVER include generic filler text like "75%" or placeholder percentages. If no specific percentage exists in the data, DO NOT invent one in the visual.
 
 Output JSON:
 {
@@ -55,6 +57,7 @@ Output JSON:
     {
       "scene_number": 1,
       "section": "SECTION NAME",
+      "article_source": "Article title or URL this scene is based on",
       "duration_seconds": 12,
       "visual_prompt": "Corporate photography style, clean professional aesthetic. [scene description]",
       "audio_script": "Max 30 words narration with key facts.",
@@ -80,8 +83,9 @@ STRICT DURATION RULES (TTS reads at 2.5 words per second):
 SCENE NUMBERING AND DISTRIBUTION:
 - Start from scene_number 1.
 - ALL sections from the context MUST appear. No section may be skipped.
-- 1 article = 1 scene. Multiple related articles can share 1 scene.
-- Distribute proportionally: a section with 1 article gets 1 scene, a section with 8 articles gets 5-7 scenes.
+- 1 article = 1 scene. NEVER combine multiple articles into a single scene.
+- CRITICAL: If an article contains MULTIPLE distinct news items (e.g., FCAS pitch, Pinaka export, AMCA update, defense exports), create SEPARATE scenes for each distinct topic.
+- Distribute proportionally: a section with 1 article gets 1 scene, a section with 8 articles gets 8 scenes.
 - STRICT RULE: NEVER mix information across categories. A scene for a specific section MUST ONLY use facts from that section's articles. Do not hallucinate.
 
 NARRATION RULES:
@@ -139,6 +143,8 @@ MOOD: news briefing meets premium financial research report.
 Serious, structured, data-dense but visually clean. No gradients. No photos.
 Flat technical illustration only. No photorealism. No cartoon. No sci-fi. No watermarks.
 
+CRITICAL ANTI-HALLUCINATION RULE for visual_prompts: ONLY use EXACT data from headline_stat and bullet_points. NEVER invent percentages like "75%" or generic stats. If the data doesn't have a specific number, the visual must NOT include one.
+
 Every visual_prompt MUST begin with: " briefing infographic,dossier style, horizontal landscape layout, cream parchment background (#F2EDE0)."
 TEXT REQUIREMENT: Every visual_prompt MUST explicitly command the image generator to render the exact SECTION NAME prominently in clean, bold, typography at the very top edge of the image.
 
@@ -146,7 +152,7 @@ For each scene you MUST also provide these structured fields:
 - "category_label": ALL-CAPS topic label (e.g. "GEOPOLITICAL UPDATE", "INDUSTRY UPDATE", "MARKET SHIFT", "DEFENSE INTEL", "TECH BREAKTHROUGH")
 - "headline_stat": the single most impactful number or short phrase for the large stat display (e.g. "$1B", "8.2%", "98%", "13-TON")
 - "headline_caption": a short caption below the stat (e.g. "GE Aerospace U.S. Investment")
-- "icon_type": one of: jet, ship, factory, shield, chart, globe, drone, rocket
+- "icon_type": one of: jet (for aviation/aerospace companies), ship (maritime), factory (manufacturing sites), shield (defense), chart (data), globe (trade), drone, rocket
 - "bullet_points": array of 3-5 short fact strings in monospace style
 - "source_label": attribution line (e.g. "Source: geaerospace.com | Mar 2026")
 - "accent_color": one of: "orange" (threats/alerts), "blue" (data/positive), "green" (competitor/secondary)
@@ -158,11 +164,12 @@ Output JSON:
     {
       "scene_number": 1,
       "section": "SECTION NAME",
+      "article_source": "Article title or URL this scene is based on",
       "duration_seconds": 12,
       "category_label": "GEOPOLITICAL UPDATE",
       "headline_stat": "$1B",
       "headline_caption": "GE Aerospace U.S. Investment",
-      "icon_type": "factory",
+      "icon_type": "jet",
       "bullet_points": ["30+ communities across 17 states", "5,000 new jobs", "Defence: $275M allocated"],
       "source_label": "Source: geaerospace.com | Mar 2026",
       "accent_color": "blue",

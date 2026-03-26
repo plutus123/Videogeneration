@@ -16,7 +16,16 @@ def _audio_duration(path):
         return 0
 
 
-def build_video(scenes, image_dir, audio_dir, output_path):
+def build_video(scenes, image_dir, audio_dir, output_path, include_audio=True):
+    """Build a single video from scenes.
+
+    Args:
+        scenes:        List of scene dicts.
+        image_dir:     Directory containing scene_N.png files.
+        audio_dir:     Directory containing scene_N.mp3 files.
+        output_path:   Where to write the .mp4.
+        include_audio: If False, build a silent video (no voiceover).
+    """
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     clips = []
 
@@ -32,7 +41,7 @@ def build_video(scenes, image_dir, audio_dir, output_path):
             continue
 
         duration = target_dur
-        has_audio = os.path.exists(audio_path)
+        has_audio = include_audio and os.path.exists(audio_path)
         if has_audio:
             audio_dur = _audio_duration(audio_path)
             if audio_dur > 0:
@@ -68,3 +77,31 @@ def build_video(scenes, image_dir, audio_dir, output_path):
     final.close()
 
     return output_path
+
+
+def build_video_pair(scenes, image_dir, audio_dir, output_dir):
+    """Build TWO videos: one with voiceover, one without.
+
+    Args:
+        scenes:     List of scene dicts.
+        image_dir:  Directory containing scene images.
+        audio_dir:  Directory containing scene audio.
+        output_dir: Directory to write both videos into.
+
+    Returns:
+        Tuple of (path_with_voice, path_without_voice).
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    path_with = os.path.join(output_dir, "final_with_voiceover.mp4")
+    path_without = os.path.join(output_dir, "final_without_voiceover.mp4")
+
+    print("  Building video WITH voiceover...")
+    build_video(scenes, image_dir, audio_dir, path_with, include_audio=True)
+    print(f"  -> {path_with}")
+
+    print("  Building video WITHOUT voiceover...")
+    build_video(scenes, image_dir, audio_dir, path_without, include_audio=False)
+    print(f"  -> {path_without}")
+
+    return path_with, path_without

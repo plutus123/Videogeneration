@@ -1,0 +1,75 @@
+{
+  "textual_summary": "Weekly Rolls-Royce intelligence briefing covering company updates, market impact, and competitive landscape.",
+  "scenes": [
+    {
+      "slide_number": 1,
+      "question": "What's happening in Rolls-Royce?",
+      "category_label": "ROLLS-ROYCE UPDATE",
+      "headline_stat": "Delta orders 62 RR engines",
+      "headline_caption": "Delta backbone expansion in the Americas",
+      "icon_type": "jet",
+      "bullet_points": [
+        "30 Trent XWB-84 EP + 32 Trent 7000 engines",
+        "Powering 15 A350-900s and 16 A330neo",
+        "TotalCare coverage for the Delta fleet",
+        "Delta is RR's largest partner in the Americas"
+      ],
+      "source_label": "Source: rolls-royce.com | Date",
+      "accent_color": "blue",
+      "audio_script": "Delta orders 62 RR engines: 30 XWB-84 EP and 32 Trent 7000, powering 15 A350-900s and 16 A330neos. Fleet under TotalCare, reinforcing RR's largest-partner status in the Americas.",
+      "duration_seconds": 12.0,
+      "scene_number": 1,
+      "section": "What's happening in Rolls-Royce?",
+      "article_source": "",
+      "visual_prompt": "briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). Render 'ROLLS-ROYCE UPDATE' prominently at the top edge in bold dark navy typography. Center-left: large bold 'Delta orders 62 RR engines' with flat jet icon. Center-right: monospace bullet points: 30 Trent XWB-84 EP + 32 Trent 7000 engines; Powering 15 A350-900s and 16 A330neo; TotalCare coverage for the Delta fleet; Delta is RR's largest partner in the Americas. Bottom strip: Source: rolls-royce.com | Date. ONLY show exact data listed above. Do NOT invent any numbers.",
+      "on_screen_text": "Delta orders 62 RR engines"
+    },
+    {
+      "slide_number": 2,
+      "question": "How is it affecting the market?",
+      "category_label": "MARKET IMPACT",
+      "headline_stat": "62 engines (Delta), 36 (China Airlines), 12 (EgyptAir)",
+      "headline_caption": "Multi-regional engine wins and TotalCare uptake",
+      "icon_type": "chart",
+      "bullet_points": [
+        "Delta: 62 RR engines for 31 jets (15 A350-900, 16 A330neo)",
+        "China Airlines: 36 XWB engines for 15 A350-1000, 3 A350-900",
+        "EgyptAir: 12 XWB-84 engines for six A350-900; TotalCare",
+        "TotalCare growth expands RR service revenue; regional footprint broadens"
+      ],
+      "source_label": "Source: rolls-royce.com | Date",
+      "accent_color": "orange",
+      "audio_script": "Delta secures 62 RR engines for 31 jets, including 15 A350-900s and 16 A330neos. China Airlines signs 36 TotalCare engines for 15 A350-1000s and 3 A350-900s. EgyptAir adds 12 engines; TotalCare.",
+      "duration_seconds": 12.0,
+      "scene_number": 2,
+      "section": "How is it affecting the market?",
+      "article_source": "",
+      "visual_prompt": "briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). Render 'MARKET IMPACT' prominently at the top edge in bold dark navy typography. Center-left: large bold '62 engines (Delta), 36 (China Airlines), 12 (EgyptAir)' with flat chart icon. Center-right: monospace bullet points: Delta: 62 RR engines for 31 jets (15 A350-900, 16 A330neo); China Airlines: 36 XWB engines for 15 A350-1000, 3 A350-900; EgyptAir: 12 XWB-84 engines for six A350-900; TotalCare; TotalCare growth expands RR service revenue; regional footprint broadens. Bottom strip: Source: rolls-royce.com | Date. ONLY show exact data listed above. Do NOT invent any numbers.",
+      "on_screen_text": "62 engines (Delta), 36 (China Airlines), 12 (EgyptAir)"
+    },
+    {
+      "slide_number": 3,
+      "question": "How is the competition doing?",
+      "category_label": "COMPETITIVE LANDSCAPE",
+      "headline_stat": "CFM56/LEAP totals; RISE >20% targets",
+      "headline_caption": "Scale of CFM/RISE program in play",
+      "icon_type": "shield",
+      "bullet_points": [
+        "CFM56: 14,650+ aircraft powered; 54,000+ engines ordered",
+        "LEAP: ~3,500 aircraft; 42,500+ engines delivered",
+        "RISE: >20% lower fuel/CO2; open fan and hybrid electric",
+        "SAF/hydrogen ready; extended to 2050"
+      ],
+      "source_label": "Source: geaerospace.com | Date",
+      "accent_color": "green",
+      "audio_script": "GE and Safran shape propulsion competition: CFM56/LEAP totals exceed 96,000 engines and 14,650 aircraft. RISE seeks >20% fuel/CO2 reductions, with open fan, hybrid electric, SAF/hydrogen readiness to 2050.",
+      "duration_seconds": 12.0,
+      "scene_number": 3,
+      "section": "How is the competition doing?",
+      "article_source": "",
+      "visual_prompt": "briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). Render 'COMPETITIVE LANDSCAPE' prominently at the top edge in bold dark navy typography. Center-left: large bold 'CFM56/LEAP totals; RISE >20% targets' with flat shield icon. Center-right: monospace bullet points: CFM56: 14,650+ aircraft powered; 54,000+ engines ordered; LEAP: ~3,500 aircraft; 42,500+ engines delivered; RISE: >20% lower fuel/CO2; open fan and hybrid electric; SAF/hydrogen ready; extended to 2050. Bottom strip: Source: geaerospace.com | Date. ONLY show exact data listed above. Do NOT invent any numbers.",
+      "on_screen_text": "CFM56/LEAP totals; RISE >20% targets"
+    }
+  ],
+  "overall_style": "flat infographic, technical illustration"
+}

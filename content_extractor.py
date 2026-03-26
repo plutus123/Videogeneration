@@ -4,6 +4,36 @@ import cloudscraper
 from bs4 import BeautifulSoup
 from utils.azure_client import get_azure_client, get_chat_deployment
 
+
+def _fetch_with_playwright(url: str, timeout: int = 30) -> str | None:
+    """Fetch page HTML using Playwright (headless Chromium).
+    Works on both Mac and Windows. Returns raw HTML string or None."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("    Playwright not installed. Run: pip install playwright && playwright install chromium")
+        return None
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(
+                user_agent=(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/131.0.0.0 Safari/537.36"
+                ),
+                viewport={"width": 1920, "height": 1080},
+            )
+            page = context.new_page()
+            page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
+            page.wait_for_timeout(2000)  # let JS render
+            html = page.content()
+            browser.close()
+            return html
+    except Exception as e:
+        print(f"    Playwright failed: {type(e).__name__}: {str(e)[:100]}")
+        return None
+
 _SESSION = requests.Session()
 _SESSION.headers.update({
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -111,7 +141,17 @@ def fetch_article(url: str, timeout: int = 30) -> dict | None:
                     return result
             except Exception as cs_e:
                 print(f"    Cloudscraper also failed: {type(cs_e).__name__}")
-                return None
+            # Final fallback: Playwright (real browser)
+            print(f"    Trying Playwright (headless browser)...")
+            html = _fetch_with_playwright(url, timeout=timeout)
+            if html:
+                soup = BeautifulSoup(html, "html.parser")
+                title = _extract_title(soup)
+                text = _extract_article_text(soup)
+                if text and len(text) >= 100:
+                    return {"title": title or url, "content": text}
+            print(f"    All extraction methods failed for this URL")
+            return None
         print(f"    ERROR: {type(e).__name__}: {e}")
         return None
     except Exception as e:
