@@ -6,13 +6,25 @@ import urllib.request
 from PIL import Image, ImageDraw, ImageFont
 from utils.azure_client import get_azure_client, get_image_deployment
 
+import sys
 
-FONT_PATHS = [
-    "C:\\Windows\\Fonts\\arial.ttf",
-    "C:\\Windows\\Fonts\\segoeui.ttf",
-    "C:\\Windows\\Fonts\\calibri.ttf",
-    "C:\\Windows\\Fonts\\verdana.ttf",
-]
+# Cross-platform font paths — detect OS and use appropriate fonts
+if sys.platform == "darwin":
+    # macOS
+    FONT_PATHS = [
+        "/System/Library/Fonts/Helvetica.ttc",
+        "/System/Library/Fonts/SFNSText.ttf",
+        "/Library/Fonts/Arial.ttf",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+    ]
+else:
+    # Windows
+    FONT_PATHS = [
+        "C:\\Windows\\Fonts\\arial.ttf",
+        "C:\\Windows\\Fonts\\segoeui.ttf",
+        "C:\\Windows\\Fonts\\calibri.ttf",
+        "C:\\Windows\\Fonts\\verdana.ttf",
+    ]
 
 # ---------------------------------------------------------------------------
 # Style preamble prepended to every visual_prompt in infographic mode.

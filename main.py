@@ -1,226 +1,180 @@
+"""AMCA Defence Intelligence Video Generator.
+
+End-to-end pipeline:
+  1. Tavily Search  → Find AMCA/defence news articles
+  2. Curation       → Filter & rank with GPT-5-nano (local fallback)
+  3. Scene Planning → Generate video scene plan via GPT
+  4. Image Gen      → Generate infographic images via Azure OpenAI
+  5. TTS            → Generate narration audio
+  6. Video Assembly → Compose final MP4 (with and without voiceover)
+
+Usage:
+    python main.py                           # Full pipeline
+    python main.py --plan-only               # Stop after scene plan
+    python main.py --skip-images             # Skip image generation
+    python main.py --skip-audio              # Skip TTS
+    python main.py --style photo             # Photorealistic style
+    python main.py --output-dir assets/runs/custom_run
+"""
+
 import os
 import sys
 import json
 import argparse
+
 from image_generator import generate_scene_image, add_text_overlay
 from utils.tts_utils import text_to_speech
 from video_builder import build_video_pair
 
 
-def _extract(urls_config_path, extracted_path):
-    from content_extractor import extract_content
-    print("STEP 1: Extracting content from URLs")
-    fetched, section_mapping = extract_content(urls_config_path, save_path=extracted_path)
-    return fetched, section_mapping
-
-
-def _plan(fetched, section_mapping, scene_json_path, style="infographic"):
-    from content_extractor import build_context
-    from scene_planner import generate_scene_plan, save_scene_plan
-    print("\nSTEP 2: Generating scene plan via GPT")
-    context = build_context(fetched, section_mapping)
-    plan = generate_scene_plan(context, style=style)
-    save_scene_plan(plan, scene_json_path)
-    num_scenes = len(plan.get("scenes", []))
-    total_dur = sum(s.get("duration_seconds", 0) for s in plan.get("scenes", []))
-    print(f"Generated {num_scenes} scenes, {total_dur}s total")
-    return plan
-
-
-def _generate_assets_and_video(data, image_dir, audio_dir, output_dir, args):
-    """Generate images, audio, and TWO videos (with/without voiceover).
-
-    Shared by all modes (auto, urls, scene).
-    """
-    scenes = data["scenes"]
-    style = data.get("overall_style", "")
-    visual_style = args.style
-    total = len(scenes)
-    total_dur = sum(s.get("duration_seconds", 0) for s in scenes)
-
-    os.makedirs(image_dir, exist_ok=True)
-    os.makedirs(audio_dir, exist_ok=True)
-
-    if not args.skip_images:
-        print(f"\nGenerating {total} scene images...")
-        for scene in scenes:
-            num = scene["scene_number"]
-            raw_path = os.path.join(image_dir, f"scene_{num}_raw.png")
-            final_path = os.path.join(image_dir, f"scene_{num}.png")
-            if os.path.exists(final_path) and os.path.getsize(final_path) > 0:
-                print(f"  Scene {num}/{total} (cached)")
-                continue
-            print(f"  Scene {num}/{total}")
-            generate_scene_image(
-                scene["visual_prompt"], raw_path,
-                style=style, model=args.model,
-                visual_style=visual_style,
-            )
-            if visual_style == "infographic":
-                os.replace(raw_path, final_path)
-            else:
-                text = scene.get("on_screen_text", "")
-                add_text_overlay(raw_path, text, final_path)
-
-    if not args.skip_audio:
-        print(f"\nGenerating {total} narration clips...")
-        for scene in scenes:
-            num = scene["scene_number"]
-            script = scene.get("audio_script", "")
-            if script:
-                audio_path = os.path.join(audio_dir, f"scene_{num}.mp3")
-                if os.path.exists(audio_path) and os.path.getsize(audio_path) > 0:
-                    print(f"  Scene {num}/{total} (cached)")
-                    continue
-                print(f"  Scene {num}/{total}")
-                text_to_speech(script, audio_path, voice=args.voice)
-
-    print(f"\nAssembling 2 videos ({total} scenes, {total_dur:.1f}s)...")
-    path_with, path_without = build_video_pair(scenes, image_dir, audio_dir, output_dir)
-    print(f"\nDone!")
-    print(f"  With voiceover:    {path_with}")
-    print(f"  Without voiceover: {path_without}")
-
-
-def _auto_pipeline(args):
-    """Automated pipeline: Tavily search -> Curation -> 3-slide briefing -> Video pair."""
-    from tavily_search import search_aviation_news, load_whitelist_from_config
-    from curation_agent import curate_articles, generate_briefing_summary
+def run_pipeline(args):
+    """Full end-to-end pipeline: Search → Curate → Plan → Images → TTS → Video."""
+    from tavily_search import search_aviation_news
+    from curation_agent import curate_articles
+    from scene_planner import generate_scene_plan, save_scene_plan, build_context_from_curated
 
     run_dir = args.output_dir
     os.makedirs(run_dir, exist_ok=True)
+    image_dir = os.path.join(run_dir, "images")
+    audio_dir = os.path.join(run_dir, "audio")
+    output_dir = os.path.join(run_dir, "outputs")
 
+    # ─── STEP 1: Search ──────────────────────────────────────────────
     print("=" * 60)
-    print("STEP 1: Searching aviation news via Tavily")
+    print("STEP 1: Searching AMCA & defence news")
     print("=" * 60)
-    whitelist = load_whitelist_from_config("urls_config.json")
+
+    days_back = args.days_back if args.days_back != 7 else None
     search_results = search_aviation_news(
-        whitelist=whitelist,
-        days_back=args.days_back,
+        days_back=days_back,
         save_path=os.path.join(run_dir, "tavily_results.json"),
     )
     if not search_results:
-        print("ERROR: No search results found. Check TAVILY_API_KEY and internet.")
+        print("❌ No search results found. Check TAVILY_API_KEY and internet.")
         sys.exit(1)
+    print(f"✅ Found {len(search_results)} articles")
 
+    # ─── STEP 2: Curate ──────────────────────────────────────────────
     print("\n" + "=" * 60)
-    print("STEP 2: Curating and ranking articles")
+    print("STEP 2: Curating articles (GPT-5-nano primary)")
     print("=" * 60)
+
     curated = curate_articles(
         search_results,
         save_path=os.path.join(run_dir, "curated_articles.json"),
     )
+    selected = curated.get("selected_articles", [])
+    if not selected:
+        print("❌ No relevant articles found after curation.")
+        sys.exit(1)
+    print(f"✅ Curated {len(selected)} articles")
 
+    # ─── Export to Excel ─────────────────────────────────────────────
+    from utils.excel_export import export_to_excel
+    excel_path = os.path.join(run_dir, "articles_report.xlsx")
+    export_to_excel(search_results, curated, excel_path)
+
+    # ─── STEP 3: Scene Plan ──────────────────────────────────────────
     print("\n" + "=" * 60)
-    print("STEP 3: Generating 3-slide briefing summary")
+    print("STEP 3: Generating video scene plan")
     print("=" * 60)
+
+    context = build_context_from_curated(curated)
     scene_plan_path = os.path.join(run_dir, "generated_scene_plan.json")
-    plan = generate_briefing_summary(curated, save_path=scene_plan_path)
+    plan = generate_scene_plan(context, style=args.style)
+    save_scene_plan(plan, scene_plan_path)
+
+    scenes = plan.get("scenes", [])
+    total_dur = sum(s.get("duration_seconds", 0) for s in scenes)
+    print(f"✅ Generated {len(scenes)} scenes, {total_dur:.1f}s total -> {scene_plan_path}")
 
     if args.plan_only:
-        print(f"\nScene plan saved to {scene_plan_path}")
+        print(f"\n🛑 Plan-only mode. Scene plan saved to: {scene_plan_path}")
         return
 
-    _generate_assets_and_video(
-        plan,
-        image_dir=os.path.join(run_dir, "images"),
-        audio_dir=os.path.join(run_dir, "audio"),
-        output_dir=os.path.join(run_dir, "outputs"),
-        args=args,
-    )
+    # ─── STEP 4: Image Generation ────────────────────────────────────
+    if not args.skip_images:
+        print("\n" + "=" * 60)
+        print(f"STEP 4: Generating {len(scenes)} scene images")
+        print("=" * 60)
+        os.makedirs(image_dir, exist_ok=True)
 
+        overall_style = plan.get("overall_style", "")
+        for scene in scenes:
+            num = scene["scene_number"]
+            raw_path = os.path.join(image_dir, f"scene_{num}_raw.png")
+            final_path = os.path.join(image_dir, f"scene_{num}.png")
 
-def _resolve_dirs(args):
-    """Set image_dir, audio_dir, output_dir from --version flag."""
-    if args.version:
-        run_dir = os.path.join("assets", "runs", args.version)
-        os.makedirs(run_dir, exist_ok=True)
-        args.image_dir = os.path.join(run_dir, "images")
-        args.audio_dir = os.path.join(run_dir, "audio")
-        args.output_dir = os.path.join(run_dir, "outputs")
+            if os.path.exists(final_path) and os.path.getsize(final_path) > 0:
+                print(f"  Scene {num}/{len(scenes)} (cached)")
+                continue
+
+            print(f"  Scene {num}/{len(scenes)}...")
+            generate_scene_image(
+                scene["visual_prompt"], raw_path,
+                style=overall_style, model=args.model,
+                visual_style=args.style,
+            )
+
+            if args.style == "infographic":
+                os.replace(raw_path, final_path)
+            else:
+                text = scene.get("on_screen_text", "")
+                add_text_overlay(raw_path, text, final_path)
     else:
-        args.image_dir = "assets/images"
-        args.audio_dir = "assets/audio"
-        args.output_dir = "assets/outputs"
+        print("\n⏭️  Skipping image generation (--skip-images)")
 
+    # ─── STEP 5: TTS Audio ───────────────────────────────────────────
+    if not args.skip_audio:
+        print("\n" + "=" * 60)
+        print(f"STEP 5: Generating {len(scenes)} narration clips")
+        print("=" * 60)
+        os.makedirs(audio_dir, exist_ok=True)
 
-def _add_common_args(parser):
-    """Add flags shared by urls and scene sub-parsers."""
-    parser.add_argument("--skip-images", action="store_true")
-    parser.add_argument("--skip-audio", action="store_true")
-    parser.add_argument("--model", default=None)
-    parser.add_argument("--voice", default="alloy")
-    parser.add_argument("--style", choices=["photo", "infographic"], default="infographic")
-    parser.add_argument("--version", default=None)
+        for scene in scenes:
+            num = scene["scene_number"]
+            script = scene.get("audio_script", "")
+            if not script:
+                continue
+
+            audio_path = os.path.join(audio_dir, f"scene_{num}.mp3")
+            if os.path.exists(audio_path) and os.path.getsize(audio_path) > 0:
+                print(f"  Scene {num}/{len(scenes)} (cached)")
+                continue
+
+            print(f"  Scene {num}/{len(scenes)}...")
+            text_to_speech(script, audio_path, voice=args.voice)
+    else:
+        print("\n⏭️  Skipping audio generation (--skip-audio)")
+
+    # ─── STEP 6: Video Assembly ──────────────────────────────────────
+    print("\n" + "=" * 60)
+    print(f"STEP 6: Assembling video ({len(scenes)} scenes, {total_dur:.1f}s)")
+    print("=" * 60)
+
+    path_with, path_without = build_video_pair(scenes, image_dir, audio_dir, output_dir)
+
+    print("\n" + "=" * 60)
+    print("✅ PIPELINE COMPLETE")
+    print("=" * 60)
+    print(f"  With voiceover:    {path_with}")
+    print(f"  Without voiceover: {path_without}")
+    print(f"  Output directory:  {run_dir}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Aviation news video generator")
-    sub = parser.add_subparsers(dest="command")
-
-    # ------ AUTO mode ------
-    auto_p = sub.add_parser("auto", help="Auto-search, curate, and generate 3-slide briefing video")
-    auto_p.add_argument("--output-dir", default="assets/runs/auto")
-    auto_p.add_argument("--days-back", type=int, default=7)
-    auto_p.add_argument("--plan-only", action="store_true")
-    auto_p.add_argument("--skip-images", action="store_true")
-    auto_p.add_argument("--skip-audio", action="store_true")
-    auto_p.add_argument("--model", default=None)
-    auto_p.add_argument("--voice", default="alloy")
-    auto_p.add_argument("--style", choices=["photo", "infographic"], default="infographic")
-
-    # ------ URLS mode ------
-    urls_p = sub.add_parser("urls", help="Generate video from URLs config")
-    urls_p.add_argument("input", help="Path to URLs config JSON")
-    urls_p.add_argument("--plan-only", action="store_true")
-    urls_p.add_argument("--extracted-json", default="extracted_content.json")
-    urls_p.add_argument("--scene-json", default="generated_scene_plan.json")
-    _add_common_args(urls_p)
-
-    # ------ SCENE mode ------
-    scene_p = sub.add_parser("scene", help="Generate video from existing scene plan JSON")
-    scene_p.add_argument("input", help="Path to scene plan JSON")
-    _add_common_args(scene_p)
-
+    parser = argparse.ArgumentParser(description="AMCA Defence Intelligence Video Generator")
+    parser.add_argument("--output-dir", default="assets/runs/auto", help="Output directory")
+    parser.add_argument("--days-back", type=int, default=7, help="Days back to search (default: auto weekly)")
+    parser.add_argument("--plan-only", action="store_true", help="Stop after generating scene plan")
+    parser.add_argument("--skip-images", action="store_true", help="Skip image generation")
+    parser.add_argument("--skip-audio", action="store_true", help="Skip TTS audio generation")
+    parser.add_argument("--model", default=None, help="Override Azure OpenAI model deployment")
+    parser.add_argument("--voice", default="alloy", help="TTS voice (default: alloy)")
+    parser.add_argument("--style", choices=["photo", "infographic"], default="infographic",
+                        help="Visual style (default: infographic)")
     args = parser.parse_args()
-
-    if args.command is None:
-        parser.print_help()
-        sys.exit(1)
-
-    if args.command == "auto":
-        _auto_pipeline(args)
-        return
-
-    # --- URLS / SCENE modes ---
-    _resolve_dirs(args)
-
-    if not os.path.exists(args.input):
-        print(f"Error: {args.input} not found")
-        sys.exit(1)
-
-    with open(args.input) as f:
-        data = json.load(f)
-
-    if args.command == "urls":
-        if args.version:
-            run_dir = os.path.join("assets", "runs", args.version)
-            if args.extracted_json == "extracted_content.json":
-                args.extracted_json = os.path.join(run_dir, "extracted_content.json")
-            if args.scene_json == "generated_scene_plan.json":
-                args.scene_json = os.path.join(run_dir, "generated_scene_plan.json")
-
-        fetched, section_mapping = _extract(args.input, args.extracted_json)
-        data = _plan(fetched, section_mapping, args.scene_json, style=args.style)
-        if args.plan_only:
-            print(f"\nScene plan saved to {args.scene_json}")
-            return
-
-    if "scenes" not in data:
-        print("Error: Invalid scene plan JSON (missing 'scenes' key)")
-        sys.exit(1)
-
-    _generate_assets_and_video(data, args.image_dir, args.audio_dir, args.output_dir, args)
+    run_pipeline(args)
 
 
 if __name__ == "__main__":

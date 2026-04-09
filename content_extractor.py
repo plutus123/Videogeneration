@@ -1,38 +1,16 @@
 import json
 import requests
 import cloudscraper
+from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from utils.azure_client import get_azure_client, get_chat_deployment
 
-
-def _fetch_with_playwright(url: str, timeout: int = 30) -> str | None:
-    """Fetch page HTML using Playwright (headless Chromium).
-    Works on both Mac and Windows. Returns raw HTML string or None."""
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        print("    Playwright not installed. Run: pip install playwright && playwright install chromium")
-        return None
-    try:
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            context = browser.new_context(
-                user_agent=(
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/131.0.0.0 Safari/537.36"
-                ),
-                viewport={"width": 1920, "height": 1080},
-            )
-            page = context.new_page()
-            page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
-            page.wait_for_timeout(2000)  # let JS render
-            html = page.content()
-            browser.close()
-            return html
-    except Exception as e:
-        print(f"    Playwright failed: {type(e).__name__}: {str(e)[:100]}")
-        return None
+# Government / protected domains that may need heavier scraping
+GOV_DOMAINS = [
+    "pib.gov.in",
+    "mod.gov.in",
+    "mea.gov.in",
+]
 
 _SESSION = requests.Session()
 _SESSION.headers.update({
@@ -48,6 +26,56 @@ _REMOVE_TAGS = {"script", "style", "nav", "header", "footer", "aside",
                 "noscript", "svg", "form", "button", "iframe"}
 _NOISE_CLASSES = {"sidebar", "widget", "advert", "promo", "related",
                   "comment", "social", "share", "newsletter", "popup"}
+
+
+def _is_gov_domain(url: str) -> bool:
+    """Check if a URL belongs to a government domain."""
+    domain = urlparse(url).netloc.replace("www.", "")
+    return any(d in domain for d in GOV_DOMAINS)
+
+
+def _fetch_with_playwright(url: str, timeout: int = 30, stealth: bool = False) -> str | None:
+    """LAST RESORT: Fetch page HTML using Playwright (headless Chromium).
+    Heavy — only used when requests and cloudscraper fail.
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("    Playwright not installed (optional). Skipping.")
+        return None
+    try:
+        with sync_playwright() as p:
+            launch_args = [
+                "--disable-blink-features=AutomationControlled",
+                "--no-sandbox",
+            ]
+            browser = p.chromium.launch(headless=True, args=launch_args)
+            context = browser.new_context(
+                user_agent=(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/131.0.6778.109 Safari/537.36"
+                ),
+                viewport={"width": 1920, "height": 1080},
+            )
+
+            if stealth:
+                page = context.new_page()
+                page.add_init_script("""
+                    Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+                    window.chrome = { runtime: {} };
+                """)
+            else:
+                page = context.new_page()
+
+            page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
+            page.wait_for_timeout(3000)
+            html = page.content()
+            browser.close()
+            return html
+    except Exception as e:
+        print(f"    Playwright failed: {type(e).__name__}: {str(e)[:100]}")
+        return None
 
 
 def _extract_title(soup: BeautifulSoup) -> str:
@@ -115,59 +143,97 @@ def _parse_response(resp) -> dict | None:
     return {"title": title, "content": text}
 
 
+def _parse_html(html: str, url: str) -> dict | None:
+    """Parse raw HTML string (e.g. from Playwright)."""
+    soup = BeautifulSoup(html, "html.parser")
+    title = _extract_title(soup)
+    text = _extract_article_text(soup)
+    if not text or len(text) < 100:
+        return None
+    return {"title": title or url, "content": text}
+
+
+def _is_access_denied(result: dict | None) -> bool:
+    """Check if the extracted content is an access denied page."""
+    if not result:
+        return True
+    title = (result.get("title", "") or "").lower()
+    content = (result.get("content", "") or "").lower()
+    return "access denied" in title or "access denied" in content[:200]
+
+
 def fetch_article(url: str, timeout: int = 30) -> dict | None:
+    """Fetch and extract article content from a URL.
+
+    Scraping chain (lightest first, heaviest last):
+        1. requests (fast, no dependencies)
+        2. cloudscraper (handles Cloudflare, still lightweight)
+        3. Playwright (headless browser, heavy — LAST RESORT only)
+
+    All sites go through the same chain. Gov sites are NOT special-cased
+    to use Playwright first — they go through requests/cloudscraper first.
+    """
+    is_gov = _is_gov_domain(url)
+    
+    # --- Step 1: Try requests (fastest) ---
     try:
         resp = _SESSION.get(url, timeout=timeout, allow_redirects=True)
         resp.raise_for_status()
         result = _parse_response(resp)
-        if result and result["title"]:
-            return result
-        if result:
+        if result and not _is_access_denied(result):
+            if result["title"]:
+                return result
             result["title"] = url
             return result
     except requests.exceptions.HTTPError as e:
-        if e.response is not None and e.response.status_code == 403:
-            print(f"    403 from requests, trying cloudscraper...")
-            try:
-                scraper = cloudscraper.create_scraper(
-                    browser={"browser": "chrome", "platform": "windows", "mobile": False}
-                )
-                resp = scraper.get(url, timeout=timeout)
-                resp.raise_for_status()
-                result = _parse_response(resp)
-                if result:
-                    if not result["title"]:
-                        result["title"] = url
-                    return result
-            except Exception as cs_e:
-                print(f"    Cloudscraper also failed: {type(cs_e).__name__}")
-            # Final fallback: Playwright (real browser)
-            print(f"    Trying Playwright (headless browser)...")
-            html = _fetch_with_playwright(url, timeout=timeout)
-            if html:
-                soup = BeautifulSoup(html, "html.parser")
-                title = _extract_title(soup)
-                text = _extract_article_text(soup)
-                if text and len(text) >= 100:
-                    return {"title": title or url, "content": text}
-            print(f"    All extraction methods failed for this URL")
-            return None
-        print(f"    ERROR: {type(e).__name__}: {e}")
-        return None
+        status = e.response.status_code if e.response is not None else 0
+        if status != 403:
+            print(f"    requests failed: HTTP {status}")
+            # Don't fall through for non-403 errors unless it's a gov site
+            if not is_gov:
+                return None
     except Exception as e:
-        print(f"    ERROR: {type(e).__name__}: {e}")
-        return None
+        print(f"    requests failed: {type(e).__name__}")
+
+    # --- Step 2: Try cloudscraper (handles Cloudflare) ---
+    print(f"    Trying cloudscraper...")
+    try:
+        scraper = cloudscraper.create_scraper(
+            browser={"browser": "chrome", "platform": "windows", "mobile": False}
+        )
+        resp = scraper.get(url, timeout=timeout)
+        resp.raise_for_status()
+        result = _parse_response(resp)
+        if result and not _is_access_denied(result):
+            if not result["title"]:
+                result["title"] = url
+            return result
+    except Exception as cs_e:
+        print(f"    cloudscraper failed: {type(cs_e).__name__}")
+
+    # --- Step 3: LAST RESORT — Playwright (heavy, headless browser) ---
+    print(f"    Trying Playwright (last resort)...")
+    html = _fetch_with_playwright(url, timeout=timeout, stealth=is_gov)
+    if html:
+        result = _parse_html(html, url)
+        if result and not _is_access_denied(result):
+            return result
+
+    print(f"    All extraction methods failed for this URL")
+    return None
 
 
 def _summarize_article(title: str, content: str, category: str) -> str:
     client = get_azure_client()
     deployment = get_chat_deployment()
     prompt = (
-        f"You are an aviation and defence industry analyst. "
+        f"You are an aviation and defence industry analyst specializing in AMCA (Advanced Medium Combat Aircraft) "
+        f"and Indian defence programs. "
         f"Summarize the following article in 150-300 words. "
         f"Preserve ALL key facts: numbers, dollar figures, percentages, dates, "
         f"company names, product names, and strategic details. "
-        f"Focus on what matters for an aviation/defence company's competitive intelligence.\n\n"
+        f"Focus on what matters for India's AMCA program, defence manufacturing, "
+        f"and the key stakeholders (DRDO, GTRE, HAL, Tata, L&T, Bharat Forge, Adani Defence, Reliance).\n\n"
         f"Category: {category}\n"
         f"Title: {title}\n\n"
         f"Article:\n{content[:8000]}\n\n"

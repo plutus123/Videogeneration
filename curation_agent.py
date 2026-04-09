@@ -1,160 +1,270 @@
-"""Curation agent: filters, ranks, and summarizes articles around 3 Rolls-Royce questions.
+"""Curation agent: filters, ranks, and categorizes articles around AMCA and Indian defence aerospace.
 
-The 3 questions that drive the video:
-1. What's happening in Rolls-Royce?
-2. How is it affecting the market?
-3. How is the competition doing?
+Focus areas:
+1. AMCA Program Updates (tenders, RFI, RFQ, airframe, engine, prototype, etc.)
+2. Key Players & Stakeholders (DRDO, GTRE, HAL, Tata, L&T, Bharat Forge, Adani Defence, Reliance)
+3. Defence Technology & Manufacturing (5th/6th gen tech, ToT, MRO, assembly line, etc.)
 
-Each question becomes one slide in the final 30-40 second video.
+Each curated article includes its source URL for traceability.
+
+Curation modes:
+- PRIMARY: GPT-5-nano (intelligent, context-aware filtering)
+- FALLBACK: Local tiered keyword scoring (when GPT unavailable)
 """
 
 import json
 import os
-from datetime import datetime, timedelta
-from utils.azure_client import get_azure_client, get_chat_deployment
 
 
 # ---------------------------------------------------------------------------
-# Prompt for the curation/ranking step
+# Tiered keyword system for accurate relevance scoring
 # ---------------------------------------------------------------------------
-CURATION_PROMPT = """You are a senior aviation & defence intelligence analyst at Rolls-Royce.
 
-You have been given a set of recently discovered news articles. Your job is to:
-1. FILTER out irrelevant noise (celebrity gossip, unrelated politics, duplicates).
-2. RANK the remaining articles by importance using these criteria (in order):
-   - Direct Rolls-Royce news (orders, contracts, financials, leadership, product updates)
-   - Market-moving events (policy changes, tariffs, FTAs, airspace disruptions, energy security)
-   - Competitor activity (GE Aerospace, Pratt & Whitney, Safran, Airbus, Boeing, Embraer, HAL)
-   - Defence procurement and exports
-   - Supply chain and manufacturing capacity shifts
-3. For EACH selected article, tag it with one of these buckets:
-   - "rolls_royce" — directly about Rolls-Royce
-   - "market" — affects the broader aviation/defence market
-   - "competition" — about competitors or competitive landscape
+# Tier 1: AMCA-SPECIFIC — gold-standard signals (5 points each)
+TIER1_AMCA_SPECIFIC = [
+    "AMCA", "Advanced Medium Combat Aircraft",
+    "Kaveri engine", "GTRE", "DRDO ADA", "ADA Bangalore",
+    "5th generation fighter India", "fifth generation fighter India",
+    "6th generation", "sixth generation",
+    "AMCA Mark", "AMCA Mk",
+]
+
+# Tier 2: HIGH-VALUE — strong relevance signals (3 points each)
+TIER2_HIGH_VALUE = [
+    "Tenders", "RFI", "RFQ", "RFP",
+    "Transfer of Technology", "ToT",
+    "prototype", "Test bed", "Test facility",
+    "Assembly line", "FCAS", "GCAP",
+    "Make in India defence", "Atmanirbhar Bharat defence", "Atmanirbhar Bharat",
+    "Self Reliance defence", "combat aircraft India",
+    "stealth fighter", "stealth aircraft",
+    "defence manufacturing India", "defence procurement India",
+    "defence export India",
+    # India-specific defence terms
+    "Indian Air Force", "IAF", "Indian Navy defence", "Indian Army defence",
+    "Indian Army unmanned", "Indian Army technology",
+    "India defence budget", "India military",
+    "Tejas fighter", "Tejas Mark", "LCA Tejas",
+    "BrahMos", "Akash missile",
+]
+
+# Tier 3: CONTEXTUAL — only count if Tier 1 or Tier 2 also matched (1 point each)
+TIER3_CONTEXTUAL = [
+    "airframe", "engine", "Thrust", "MRO",
+    "manufacturing unit", "R&D", "R&T",
+    "engine production", "Supply chain",
+    "defence", "defense", "aerospace", "aviation",
+    "fighter", "combat aircraft",
+]
+
+# Key Players — full names (4 points each)
+KEY_PLAYERS = [
+    "DRDO", "GTRE", "HAL", "Hindustan Aeronautics",
+    "Tata Advanced Systems", "TASL",
+    "Larsen & Toubro defence", "L&T defence",
+    "Bharat Forge",
+    "Adani Defence",
+    "Reliance Defence",
+    "BEL", "Bharat Electronics",
+    "Mazagon Dock", "MDL",
+    "Indian Air Force", "Indian Army", "Indian Navy",
+]
+
+# Key Players — short names (1 point, only counted if other signals present)
+KEY_PLAYERS_SHORT = [
+    "Tata", "L&T", "Adani", "Reliance",
+]
+
+
+# ---------------------------------------------------------------------------
+# GPT Curation Prompt
+# ---------------------------------------------------------------------------
+CURATION_PROMPT = """You are a senior defence intelligence analyst at an Indian aerospace company specializing in India's AMCA (Advanced Medium Combat Aircraft) program and Indian defence aerospace.
+
+You are curating news articles. Your job:
+1. FILTER — be VERY strict. ONLY keep articles about:
+   - India's AMCA program, Indian fighter/combat aircraft, Indian defence programs
+   - Key Indian defence stakeholders: DRDO, GTRE, HAL, Tata Advanced Systems, L&T, Bharat Forge, Adani Defence, Reliance Defence
+   - AMCA-related topics: tenders, RFI, RFQ, airframe, engine, prototypes, test facilities, assembly lines
+   - Strategic programs relevant to India: FCAS, GCAP, Transfer of Technology, Make in India defence
+   - Indian defence procurement, manufacturing, and exports
+
+   REJECT articles that are:
+   - Non-aerospace (HR, jobs, census, finance, entertainment, AI/tech, cricket, politics)
+   - About non-Indian companies with NO connection to Indian defence
+   - Generic international defence news with no India angle
+   - About Reliance/Tata/L&T/Adani in NON-DEFENCE contexts (telecom, infrastructure, etc.)
+   - From paywalled sources with no readable content
+
+2. RANK remaining articles by importance (1-10):
+   - 9-10: Directly about AMCA, Kaveri engine, Indian 5th/6th gen fighter
+   - 7-8: About key stakeholders (DRDO, HAL, etc.) in defence/aerospace context
+   - 5-6: About Indian defence manufacturing, procurement, exports
+   - 3-4: About global defence programs relevant to India (FCAS, GCAP, ToT)
+
+3. Tag each article with a bucket:
+   - "amca_program" — directly about AMCA, Indian fighter development, Kaveri engine
+   - "key_players" — about DRDO, GTRE, HAL, Tata, L&T, Bharat Forge, Adani Defence, Reliance in DEFENCE context
+   - "defence_tech" — defence technology, manufacturing, ToT, MRO, FCAS, GCAP, Make in India defence
+
+4. CRITICAL: Preserve the original article URL.
 
 OUTPUT valid JSON ONLY:
 {
   "selected_articles": [
     {
-      "url": "...",
+      "url": "ORIGINAL_ARTICLE_URL_HERE",
       "title": "...",
-      "bucket": "rolls_royce" | "market" | "competition",
+      "bucket": "amca_program" | "key_players" | "defence_tech",
       "importance_score": 1-10,
       "key_facts": ["fact1", "fact2", "fact3"],
-      "summary": "2-3 sentence summary preserving all numbers, dates, company names"
+      "summary": "2-3 sentence summary preserving all numbers, dates, company names",
+      "key_players_mentioned": ["DRDO", "HAL", ...],
+      "amca_keywords_found": ["prototype", "engine", ...]
     }
   ]
 }
 
-Select the TOP 10-15 most important articles. Be ruthless — only include genuinely significant items.
-Tag at least 1-2 articles per bucket if available. If no Rolls-Royce-specific news exists, note that.
+Select ONLY genuinely relevant aerospace/defence articles. Better to return 3 good articles than 15 irrelevant ones.
 
 ARTICLES:
 """
 
 
-# ---------------------------------------------------------------------------
-# Prompt for the 3-question summary
-# ---------------------------------------------------------------------------
-SUMMARY_PROMPT = """You are a senior Rolls-Royce intelligence analyst creating a WEEKLY BRIEFING for the CEO.
+def _score_article(article):
+    """Score an article using tiered keywords. Scores title + content only (not raw_content)."""
+    title = article.get("title", "").lower()
+    content = article.get("content", "").lower()
+    text = title + " " + content
 
-Based on the curated articles below, create a structured summary answering EXACTLY 3 questions.
-Each answer becomes ONE slide in a 30-40 second video (so ~10-13 seconds per slide).
+    t1_hits = [kw for kw in TIER1_AMCA_SPECIFIC if kw.lower() in text]
+    t2_hits = [kw for kw in TIER2_HIGH_VALUE if kw.lower() in text]
 
-RULES:
-- Be QUANTITATIVE: include exact numbers ($, %, units, dates) wherever available.
-- Be QUALITATIVE: include strategic implications, not just facts.
-- Be SPECIFIC: no generic statements like "the market is evolving". Use real data.
-- Each answer should have 3-5 bullet points MAX.
-- Bullet points must be concise (under 15 words each) but data-rich.
-- The audio_script for each slide should be 25-33 words (10-13 seconds at 2.5 words/sec).
-- The audio_script MUST directly elaborate on the bullet points shown on screen. No unrelated tangents.
-- Total video: 30-40 seconds STRICT.
-- For source_label use format: "Source: domain.com | w/c DD Mon" using the week-commencing Monday date.
+    # Tier 3 only counted if Tier 1 or Tier 2 present
+    t3_hits = []
+    if t1_hits or t2_hits:
+        t3_hits = [kw for kw in TIER3_CONTEXTUAL if kw.lower() in text]
 
-OUTPUT valid JSON ONLY:
-{
-  "briefing_date": "YYYY-MM-DD",
-  "slides": [
-    {
-      "slide_number": 1,
-      "question": "What's happening in Rolls-Royce?",
-      "category_label": "ROLLS-ROYCE UPDATE",
-      "headline_stat": "Key number or phrase",
-      "headline_caption": "Short caption",
-      "icon_type": "jet",
-      "bullet_points": ["Quantitative fact 1", "Quantitative fact 2", "Strategic implication"],
-      "source_label": "Source: domain.com | Date",
-      "accent_color": "blue",
-      "audio_script": "25-33 words elaborating on the bullet points above.",
-      "duration_seconds": 12.0
-    },
-    {
-      "slide_number": 2,
-      "question": "How is it affecting the market?",
-      "category_label": "MARKET IMPACT",
-      "headline_stat": "Key number or phrase",
-      "headline_caption": "Short caption",
-      "icon_type": "chart",
-      "bullet_points": ["Market fact 1", "Market fact 2", "Strategic implication"],
-      "source_label": "Source: domain.com | Date",
-      "accent_color": "orange",
-      "audio_script": "25-33 words elaborating on the bullet points above.",
-      "duration_seconds": 12.0
-    },
-    {
-      "slide_number": 3,
-      "question": "How is the competition doing?",
-      "category_label": "COMPETITIVE LANDSCAPE",
-      "headline_stat": "Key number or phrase",
-      "headline_caption": "Short caption",
-      "icon_type": "shield",
-      "bullet_points": ["Competitor fact 1", "Competitor fact 2", "Strategic implication"],
-      "source_label": "Source: domain.com | Date",
-      "accent_color": "green",
-      "audio_script": "25-33 words elaborating on the bullet points above.",
-      "duration_seconds": 12.0
-    }
-  ],
-  "overall_style": "flat infographic, technical illustration"
-}
+    players_full = [p for p in KEY_PLAYERS if p.lower() in text]
 
-CURATED ARTICLES:
-"""
+    # Short names only if other signals present
+    players_short = []
+    if t1_hits or t2_hits or players_full:
+        players_short = [p for p in KEY_PLAYERS_SHORT if p.lower() in text]
+
+    score = (len(t1_hits) * 5) + (len(t2_hits) * 3) + (len(t3_hits) * 1) + \
+            (len(players_full) * 4) + (len(players_short) * 1)
+
+    all_keywords = t1_hits + t2_hits + t3_hits
+    all_players = players_full + players_short
+
+    return score, t1_hits, t2_hits, t3_hits, all_players, all_keywords
 
 
-def curate_articles(search_results, save_path="curated_articles.json"):
-    """Filter and rank search results using GPT.
+def _assign_bucket(t1_hits, t2_hits, players_found):
+    """Assign article to a bucket based on keyword tiers."""
+    amca_specific = {"AMCA", "Advanced Medium Combat Aircraft", "Kaveri engine",
+                     "GTRE", "DRDO ADA", "ADA Bangalore", "AMCA Mark", "AMCA Mk",
+                     "5th generation fighter India", "fifth generation fighter India",
+                     "6th generation", "sixth generation"}
 
-    Args:
-        search_results: List of article dicts from tavily_search.
-        save_path: Where to save curated results.
+    if any(kw in amca_specific for kw in t1_hits):
+        return "amca_program"
+    if players_found:
+        return "key_players"
+    return "defence_tech"
 
-    Returns:
-        Dict with selected_articles.
-    """
-    client = get_azure_client()
-    deployment = get_chat_deployment()
 
-    # Build article context for GPT
+def _try_get_gpt_client():
+    """Try to get Azure OpenAI chat client. Returns (client, deployment) or (None, None)."""
+    try:
+        from utils.azure_client import get_azure_client, get_chat_deployment
+        client = get_azure_client()
+        deployment = get_chat_deployment()
+        return client, deployment
+    except Exception as e:
+        print(f"  ⚠️  Azure OpenAI not available: {e}")
+        return None, None
+
+
+def _print_curated_articles(articles, mode):
+    """Print curated articles summary."""
+    print(f"\n  === CURATED ARTICLES ({mode}) ===")
+    for article in articles:
+        print(f"  [{article.get('bucket', '?')}] (Score: {article.get('importance_score', '?')}/10)")
+        print(f"    Title: {article.get('title', 'N/A')}")
+        print(f"    URL:   {article.get('url', 'N/A')}")
+        if article.get("key_players_mentioned"):
+            print(f"    Players: {', '.join(article['key_players_mentioned'])}")
+        print()
+
+
+def curate_articles_local(search_results, save_path="curated_articles.json"):
+    """FALLBACK: Local keyword-based curation when GPT is unavailable."""
+    print("  ⚠️  Using LOCAL keyword curation (GPT unavailable)...")
+
+    scored_articles = []
+    for article in search_results:
+        score, t1, t2, t3, players, keywords = _score_article(article)
+        if score == 0:
+            continue
+
+        bucket = _assign_bucket(t1, t2, players)
+        importance = min(10, max(1, score // 2))
+        content = article.get("content", "")
+        summary = content[:400] + "..." if len(content) > 400 else content
+
+        scored_articles.append({
+            "url": article.get("url", ""),
+            "title": article.get("title", "N/A"),
+            "bucket": bucket,
+            "importance_score": importance,
+            "key_facts": [],
+            "summary": summary,
+            "key_players_mentioned": players,
+            "amca_keywords_found": keywords,
+        })
+
+    scored_articles.sort(key=lambda x: x["importance_score"], reverse=True)
+    selected = scored_articles[:15]
+    result = {"selected_articles": selected}
+
+    if save_path:
+        os.makedirs(os.path.dirname(save_path) or ".", exist_ok=True)
+        with open(save_path, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        print(f"  Curated {len(selected)} articles (local) -> {save_path}")
+
+    _print_curated_articles(selected, "LOCAL")
+    return result
+
+
+def curate_articles_gpt(search_results, client, deployment, save_path="curated_articles.json"):
+    """PRIMARY: GPT-based curation using gpt-5-nano."""
+    # Pre-score to prioritize articles sent to GPT
+    for article in search_results:
+        score, _, _, _, _, _ = _score_article(article)
+        article["_relevance_score"] = score
+
+    search_results.sort(key=lambda x: x.get("_relevance_score", 0), reverse=True)
+
+    # Build context — top 30 articles, content only (no raw_content noise)
     articles_text = ""
-    for i, article in enumerate(search_results[:30], 1):  # Cap at 30 to fit context
-        content = article.get("raw_content") or article.get("content", "")
-        # Truncate long articles
-        content = content[:3000] if len(content) > 3000 else content
+    for i, article in enumerate(search_results[:30], 1):
+        content = article.get("content", "")[:2000]
         articles_text += (
             f"\n--- Article {i} ---\n"
             f"URL: {article['url']}\n"
             f"Title: {article.get('title', 'N/A')}\n"
-            f"Score: {article.get('score', 'N/A')}\n"
+            f"Published: {article.get('published_date', 'N/A')}\n"
             f"Content: {content}\n"
         )
 
-    print("  Curating articles with GPT...")
+    print("  Curating with GPT-5-nano...")
     response = client.chat.completions.create(
         model=deployment,
         messages=[
-            {"role": "system", "content": "You are an expert aviation intelligence analyst. Output valid JSON only."},
+            {"role": "system", "content": "You are an Indian defence aerospace analyst. Output valid JSON only. Reject non-aerospace articles strictly."},
             {"role": "user", "content": CURATION_PROMPT + articles_text},
         ],
         response_format={"type": "json_object"},
@@ -162,103 +272,32 @@ def curate_articles(search_results, save_path="curated_articles.json"):
     )
     result = json.loads(response.choices[0].message.content)
 
+    for article in result.get("selected_articles", []):
+        if not article.get("url"):
+            article["url"] = "URL not available"
+
     if save_path:
         os.makedirs(os.path.dirname(save_path) or ".", exist_ok=True)
         with open(save_path, "w", encoding="utf-8") as f:
             json.dump(result, f, indent=2, ensure_ascii=False)
         print(f"  Curated {len(result.get('selected_articles', []))} articles -> {save_path}")
 
+    _print_curated_articles(result.get("selected_articles", []), "GPT")
     return result
 
 
-def generate_briefing_summary(curated_articles, save_path="generated_scene_plan.json"):
-    """Generate the 3-slide briefing summary from curated articles.
+def curate_articles(search_results, save_path="curated_articles.json"):
+    """Filter and rank search results for AMCA/Indian defence relevance.
 
-    Args:
-        curated_articles: Dict with 'selected_articles' from curate_articles().
-        save_path: Where to save the scene plan.
-
-    Returns:
-        Dict with slides (scene plan format).
+    PRIMARY: GPT-5-nano | FALLBACK: Local keyword scoring
     """
-    client = get_azure_client()
-    deployment = get_chat_deployment()
+    client, deployment = _try_get_gpt_client()
 
-    articles = curated_articles.get("selected_articles", [])
-    articles_text = ""
-    for article in articles:
-        articles_text += (
-            f"\n[{article.get('bucket', 'unknown').upper()}] "
-            f"(Score: {article.get('importance_score', '?')}/10)\n"
-            f"Title: {article.get('title', 'N/A')}\n"
-            f"URL: {article.get('url', '')}\n"
-            f"Key Facts: {json.dumps(article.get('key_facts', []))}\n"
-            f"Summary: {article.get('summary', '')}\n"
-        )
+    if client:
+        try:
+            return curate_articles_gpt(search_results, client, deployment, save_path)
+        except Exception as e:
+            print(f"  ⚠️  GPT curation failed: {type(e).__name__}: {e}")
+            print(f"  Falling back to local keyword curation...")
 
-    print("  Generating 3-slide briefing summary...")
-    response = client.chat.completions.create(
-        model=deployment,
-        messages=[
-            {"role": "system", "content": "You are an expert video producer and aviation analyst for Rolls-Royce. Output valid JSON only."},
-            {"role": "user", "content": SUMMARY_PROMPT + articles_text},
-        ],
-        response_format={"type": "json_object"},
-        timeout=120,
-    )
-    plan = json.loads(response.choices[0].message.content)
-
-    # Compute week-commencing date (Monday of current week)
-    today = datetime.now()
-    monday = today - timedelta(days=today.weekday())
-    wc_label = monday.strftime("w/c %d %b")
-
-    # Add visual_prompt and on_screen_text to each slide for compatibility
-    # with the existing image generation and video pipeline
-    for slide in plan.get("slides", []):
-        slide["scene_number"] = slide["slide_number"]
-        slide["section"] = slide.get("question", "")
-        slide["article_source"] = ""
-
-        # Build visual_prompt from structured fields
-        cat = slide.get("category_label", "UPDATE")
-        stat = slide.get("headline_stat", "")
-        bullets = slide.get("bullet_points", [])
-        icon = slide.get("icon_type", "chart")
-        bullets_text = "; ".join(bullets)
-
-        # Ensure source_label includes w/c date
-        src = slide.get("source_label", "")
-        if src and "w/c" not in src:
-            src = src.rstrip().rstrip("|").rstrip() + f" | {wc_label}"
-            slide["source_label"] = src
-        elif not src:
-            slide["source_label"] = f"Source: Tavily Search | {wc_label}"
-
-        slide["visual_prompt"] = (
-            f"briefing infographic, dossier style, horizontal landscape layout, "
-            f"cream parchment background (#F2EDE0). "
-            f"Render '{cat}' prominently at the top edge in bold dark navy typography. "
-            f"Center-left: large bold '{stat}' with flat {icon} icon. "
-            f"Center-right: monospace bullet points: {bullets_text}. "
-            f"Bottom strip: {slide.get('source_label', '')}. "
-            f"ONLY show exact data listed above. Do NOT invent any numbers."
-        )
-        slide["on_screen_text"] = stat
-
-    # Wrap in scene plan format
-    scene_plan = {
-        "briefing_date": wc_label,
-        "textual_summary": f"Weekly Rolls-Royce intelligence briefing ({wc_label}) covering company updates, market impact, and competitive landscape.",
-        "scenes": plan.get("slides", []),
-        "overall_style": plan.get("overall_style", "flat infographic, technical illustration"),
-    }
-
-    if save_path:
-        os.makedirs(os.path.dirname(save_path) or ".", exist_ok=True)
-        with open(save_path, "w", encoding="utf-8") as f:
-            json.dump(scene_plan, f, indent=2, ensure_ascii=False)
-        total_dur = sum(s.get("duration_seconds", 0) for s in scene_plan.get("scenes", []))
-        print(f"  Generated {len(scene_plan['scenes'])} slides, {total_dur:.1f}s total -> {save_path}")
-
-    return scene_plan
+    return curate_articles_local(search_results, save_path)

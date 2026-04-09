@@ -9,3 +9,4 @@ lxml
 cloudscraper
 playwright
 tavily-python
+openpyxl

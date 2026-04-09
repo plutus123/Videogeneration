@@ -1,60 +1,84 @@
-RR-Video Generator
+# AMCA Defence Intelligence Video Generator
 
-Generates narrated intelligence briefing videos from news articles. Uses Azure OpenAI for scene planning, image generation, and TTS narration. Outputs two MP4 videos (with and without voiceover).
+Automated weekly video briefing pipeline for Indian aerospace & defence news. Searches, curates, and generates a 2-3 minute narrated video with infographic-style slides.
 
-## Modes
+## Pipeline Flow
 
-### Mode 1: Auto (Tavily search pipeline)
-
-Searches for aviation/defence news via Tavily, curates with GPT, generates a 3-slide weekly briefing.
-
-```bash
-python main.py auto
-python main.py auto --days-back 14 --plan-only
-python main.py auto --output-dir assets/runs/my_run
+```
+Tavily Search → Post-filter → GPT Curation → Scene Plan → Image Gen → TTS → Video Assembly
 ```
 
-### Mode 2: URLs (full extraction pipeline)
+1. **Search** — Queries Tavily for AMCA, Indian defence, key player news within the current week (Monday→today)
+2. **Pre-filter** — Rejects obviously non-aerospace articles by title (IT, cricket, finance, etc.)
+3. **Curate** — GPT-5-nano filters for genuine Indian aerospace/defence relevance (local keyword fallback)
+4. **Scene Plan** — GPT generates a structured video plan: visual prompts, narration scripts, timings
+5. **Image Generation** — Azure OpenAI generates infographic-style dossier slides
+6. **TTS** — Azure TTS narrates each scene in an executive briefing voice
+7. **Video Assembly** — MoviePy composes final MP4 (with and without voiceover)
 
-Extracts content from a `urls_config.json`, plans scenes via GPT, generates video.
-
-```bash
-python main.py urls urls_config.json
-python main.py urls urls_config.json --plan-only
-python main.py urls urls_config.json --version v2
-```
-
-### Mode 3: Scene (from existing scene plan)
-
-Generates video directly from a pre-built scene plan JSON.
+## Usage
 
 ```bash
-python main.py scene generated_scene_plan.json
-python main.py scene generated_scene_plan.json --version v2
+# Full pipeline (search → video)
+python main.py
+
+# Plan only — verify search + curation + scene plan quality before generating
+python main.py --plan-only
+
+# Custom output directory
+python main.py --output-dir assets/runs/custom_name
+
+# Photorealistic style instead of infographic
+python main.py --style photo
+
+# Skip cached steps
+python main.py --skip-images --skip-audio
 ```
 
 ## Output
 
-All modes produce two videos in the output directory:
-- `final_with_voiceover.mp4`
-- `final_without_voiceover.mp4`
+All runs produce files in the output directory (`assets/runs/auto/` by default):
+- `tavily_results.json` — Raw search results
+- `curated_articles.json` — GPT-curated articles
+- `generated_scene_plan.json` — Video scene plan
+- `images/scene_N.png` — Infographic slides
+- `audio/scene_N.mp3` — TTS narration clips
+- `outputs/final_with_voiceover.mp4` — Final video with narration
+- `outputs/final_without_voiceover.mp4` — Silent version
 
-## Common flags
+## Flags
 
 | Flag | Description |
 |------|-------------|
 | `--style photo\|infographic` | Visual style (default: infographic) |
+| `--plan-only` | Stop after generating scene plan |
 | `--skip-images` | Skip image generation (use cached) |
 | `--skip-audio` | Skip audio generation (use cached) |
 | `--voice` | TTS voice name (default: alloy) |
 | `--model` | Override image model deployment |
-| `--version` | Version tag for run directory |
+| `--days-back N` | Override search window (default: auto weekly) |
+| `--output-dir` | Output directory (default: assets/runs/auto) |
 
 ## Setup
 
-Requires a `.env` file with Azure OpenAI and Tavily API keys. See `utils/azure_client.py` for expected environment variables.
+Requires a `.env` file with Azure OpenAI and Tavily API keys:
+
+```
+TAVILY_API_KEY=tvly-xxxxx
+AZURE_OPENAI_ENDPOINT=https://xxx.openai.azure.com/
+AZURE_OPENAI_API_KEY=xxxxx
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-nano
+AZURE_OPENAI_IMAGE_DEPLOYMENT=gpt-image-1.5
+AZURE_TTS_ENDPOINT=https://xxx.openai.azure.com/
+AZURE_TTS_API_KEY=xxxxx
+AZURE_TTS_DEPLOYMENT=tts
+```
 
 ```bash
 pip install -r requirements.txt
 playwright install chromium  # optional, for scraping fallback
 ```
+
+## Cross-Platform
+
+Runs on both **macOS** and **Windows**. Font paths for text overlays are auto-detected by OS.
