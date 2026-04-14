@@ -1,50 +1,438 @@
 {
+  "report_title": "AMCA & Indian Defence Aerospace Intelligence Report — Q1 2026",
+  "thematic_sections": [
+    {
+      "section_title": "AMCA Program Updates & Consortium Developments",
+      "section_summary": "This section captures developments directly related to India's Advanced Medium Combat Aircraft (AMCA) program, focusing on propulsion strategy for Mk-2, indigenous engine ambitions, and industry realignments surrounding AMCA manufacturing. Key items include GTRE's EOI submissions for an indigenous 120 kN high-thrust aero engine for AMCA Mk-2 and the broader propulsion self-reliance narrative that underpins AMCA plans.",
+      "articles": [
+        {
+          "citation_number": 1,
+          "url": "https://defence.in/threads/gtre-concludes-eoi-submissions-for-development-cum-production-partner-of-indigenous-120kn-high-thrust-aero-engine.17317/",
+          "title": "GTRE Concludes EOI Submissions for Development-cum-Production Partner of Indigenous 120kN High Thrust Aero Engine - Defence.in",
+          "published_date": "Sun, 29 Mar 2026 19:15:00 GMT",
+          "source_type": "News",
+          "source_name": "Defence.in",
+          "importance_score": 9,
+          "key_facts": [
+            "GTRE concludes EOI submissions for Development-cum-Production Partner of Indigenous 120kN High Thrust Aero Engine",
+            "120 kN class turbofan intended for AMCA Mk-2; Mk-1 to utilise existing GE engines",
+            "AMCA Mk-2 aims to achieve supercruise capabilities and enhanced maneuverability without compromising stealth",
+            "Indigenous powerplant development linked to AMCA and potential powerplants for future UCAVs"
+          ],
+          "summary": "GTRE has concluded Expressions of Interest for a development-cum-production partner to build an indigenous 120kN high-thrust aero engine, targeting the AMCA Mk-2. The AMCA Mk-1 fleet is expected to use GE-supplied engines, while the Mk-2 would rely on an indigenous powerplant to enable supercruise and high-maneuverability without sacrificing stealth. This marks a pivotal step in advancing India’s self-reliant propulsion ecosystem for fifth-generation and heavy UAV platforms, building on lessons from the Kaveri program and positioning GTRE within the AMCA propulsion ToT framework.",
+          "key_players_mentioned": [
+            "GTRE",
+            "AMCA Mk-2",
+            "AMCA Mk-1",
+            "GE"
+          ],
+          "amca_keywords_found": [
+            "AMCA Mk-2",
+            "120kN",
+            "AHTCE",
+            "indigenous engine",
+            "Mk-1",
+            "ToT"
+          ],
+          "bucket": "AMCA Program Updates & Consortium Developments"
+        }
+      ]
+    },
+    {
+      "section_title": "Engine Procurement & Foreign Collaboration",
+      "section_summary": "This section covers propulsion strategy, sovereign engine development, and international collaboration dynamics impacting AMCA and India's broader fighter propulsion landscape. It highlights the propulsion self-reliance narrative and the interplay between indigenous engine development and foreign technology transfer.",
+      "articles": [
+        {
+          "citation_number": 2,
+          "url": "https://www.airforce-technology.com/features/indias-self-reliance-campaign-hinges-on-aircraft-propulsion/",
+          "title": "India’s Self-Reliance campaign hinges on aircraft propulsion - Airforce Technology",
+          "published_date": "Wed, 18 Feb 2026 13:42:07 GMT",
+          "source_type": "News",
+          "source_name": "Airforce Technology",
+          "importance_score": 8,
+          "key_facts": [
+            "DRDO relies on imported GE F404/F414 engines for Tejas; indigenous propulsion challenges persist",
+            "Safran opened M88 engine MRO capability in Oct 2025; plan to support GTRE in developing a 120kN engine",
+            "India’s AMCA program hinges on sovereign propulsion; 120kN indigenous powerplant to be built using M88 technologies",
+            "Aatmanirbhar Bharat/self-reliance drive highlighted; sovereign aircraft propulsion remains a core bottleneck and strategic objective"
+          ],
+          "summary": "India’s propulsion autonomy remains central to the AMCA and broader defence aviation goals. The DRDO currently relies on GE F404/F414 for Tejas, while Safran’s M88 technology is being leveraged to bolster a sovereign 120kN engine. The 120kN unit aims to unlock AMCA Mk-2’s supercruise and stealth requirements, illustrating a concerted push toward indigenisation and ToT within a framework of selective foreign collaboration.",
+          "key_players_mentioned": [
+            "DRDO",
+            "GE",
+            "Safran",
+            "GTRE",
+            "AMCA"
+          ],
+          "amca_keywords_found": [
+            "AMCA",
+            "120kN",
+            "indigenous engine",
+            "ToT",
+            "M88"
+          ],
+          "bucket": "Engine Procurement & Foreign Collaboration"
+        }
+      ]
+    },
+    {
+      "section_title": "Strategic & Policy Developments (Make in India, Exports, Rafale)",
+      "section_summary": "This section captures strategic procurement decisions and policy signals shaping India's defence aerospace landscape, including large-scale Rafale acquisitions, localized production, and Make in India-related imperatives that influence AMCA ecosystem and domestic industry participation.",
+      "articles": [
+        {
+          "citation_number": 3,
+          "url": "https://www.reuters.com/world/india/india-clears-proposal-buy-114-rafale-fighter-jets-dassault-reports-say-2026-02-12/",
+          "title": "India backs $40 billion military upgrade with more Rafale fighters, Boeing P-8Is - Reuters",
+          "published_date": "Thu, 12 Feb 2026 09:01:02 GMT",
+          "source_type": "News",
+          "source_name": "Reuters",
+          "importance_score": 9,
+          "key_facts": [
+            "Defence Acquisition Council gave initial nod for a 3.6 trillion-rupee upgrade package",
+            "Includes procurement of more Rafale fighter jets and Boeing P-8I Neptune aircraft",
+            "HAL has nearly 180 of the advanced Mk-1A Tejas variants on order domestically but deliveries delayed due to GE engine supply issues",
+            "Package aligned with Modi government push for higher domestic manufacturing and Make in India"
+          ],
+          "summary": "New Delhi approved a 3.6 trillion-rupee package for upgrading armed forces, including additional Rafale fighters and P-8I aircraft, as part of a broader domestic manufacturing push. HAL’s Tejas Mk-1A delivery delays are attributed to engine supply constraints at GE, underscoring the criticality of stable propulsion supply in India’s defence industrialization. The move coincides with a visit by French President Macron and reflects strategic emphasis on domestic co-production and export-readiness in defence aerospace.",
+          "key_players_mentioned": [
+            "DRDO",
+            "GE Aerospace",
+            "HAL",
+            "Rafale",
+            "P-8I",
+            "Dassault Aviation"
+          ],
+          "amca_keywords_found": [
+            "Rafale",
+            "Make in India",
+            "domestic manufacturing",
+            "ToT"
+          ],
+          "bucket": "Strategic & Policy Developments (Make in India, Exports, Rafale)"
+        },
+        {
+          "citation_number": 5,
+          "url": "https://aerotime.aero/articles/india-39-billion-purchase-114-rafale-fighter-jet",
+          "title": "India approves $39 billion purchase of 114 Rafale jets ahead of Macron visit - AeroTime",
+          "published_date": "Thu, 12 Feb 2026 13:32:35 GMT",
+          "source_type": "News",
+          "source_name": "AeroTime",
+          "importance_score": 7,
+          "key_facts": [
+            "AoN approved for 114 Rafale MRFA jets; majority to be manufactured in India under Make in India",
+            "Rafale backlog and 50% localization target discussed; production ramp-up considerations include in-country value",
+            "Contextual link to defence diplomacy ahead of Macron visit; Rafale orders interwoven with domestic industrial participation"
+          ],
+          "summary": "AeroTime reports India’s AoN to procure 114 Rafale MRFA jets, with a strong emphasis on local production under Make in India. The piece notes a target of increasing in-country localization to around 50% for future Rafale batches and highlights Dassault’s in-country collaboration with Tata Advanced Systems. This procurement signals continuity in India’s multi-year plan to bolster air superiority while expanding domestic industry participation and export potential in the defence aerospace sector.",
+          "key_players_mentioned": [
+            "Dassault Aviation",
+            "TATA Advanced Systems",
+            "Rafale",
+            "India (MoD)",
+            "France"
+          ],
+          "amca_keywords_found": [
+            "Rafale",
+            "Make in India",
+            "local production",
+            "in-country localization"
+          ],
+          "bucket": "Strategic & Policy Developments (Make in India, Exports, Rafale)"
+        }
+      ]
+    },
+    {
+      "section_title": "Defence Manufacturing, MRO & Supply Chain",
+      "section_summary": "This section highlights sustainment, MRO, and industrial collaboration developments that strengthen India’s defence aerospace backbone, including Dhruv rotorcraft deliveries to the coast guard and broader MRO ecosystem enhancements.",
+      "articles": [
+        {
+          "citation_number": 4,
+          "url": "https://www.flightglobal.com/fixed-wing/hal-delivers-four-dhruv-mk-iiis-to-indian-coast-guard/166532.article",
+          "title": "HAL delivers four Dhruv Mk IIIs to Indian coast guard - FlightGlobal",
+          "published_date": "Thu, 05 Mar 2026 08:06:01 GMT",
+          "source_type": "News",
+          "source_name": "FlightGlobal",
+          "importance_score": 7,
+          "key_facts": [
+            "HAL delivers four Dhruv Mk IIIs to Indian Coast Guard",
+            "Contract worth INR 29 billion for six additional helicopters; Dhruv is powered by HAL/Safran Shakti-1H1 turboshafts ( Ardiden 1 lineage)",
+            "Induction aims to enhance safety and protection of offshore infrastructure and maritime environment"
+          ],
+          "summary": "Hindustan Aeronautics Limited has delivered four Dhruv Mk IIIs to the Indian Coast Guard under a contract valued at INR 29 billion. The Dhruv is powered by HAL/Safran Shakti-1H1 turboshafts, derived from the Ardiden family, and the contract’s scale reinforces HAL’s rotorcraft sustainment and coast guard mobility capabilities. This expansion supports India’s domestic rotorcraft production and MRO footprint as part of broader defence manufacturing goals.",
+          "key_players_mentioned": [
+            "HAL",
+            "Coast Guard",
+            "Safran",
+            "Shakti-1H1"
+          ],
+          "amca_keywords_found": [
+            "Dhruv Mk III",
+            "coast guard",
+            "HAL/Safran",
+            "turboshaft"
+          ],
+          "bucket": "Defence Manufacturing, MRO & Supply Chain"
+        }
+      ]
+    },
+    {
+      "section_title": "Strategic Industry Partnerships & Global Collaboration",
+      "section_summary": "This section captures cross-border collaborations and strategic partnerships that influence India’s defence aerospace ecosystem, including indigenous industry participation and international cooperation that supports domestic capabilities.",
+      "articles": [
+        {
+          "citation_number": 5,
+          "url": "https://eurasiantimes.com/missile-ex-iaf-air-marshal-shares-key-details/",
+          "title": "Missile & Radar Success Fuels India’s Defense Self-Reliance & Exports; Ex-IAF Air Marshal Shares Key Details - EurAsian Times",
+          "published_date": "Sun, 08 Feb 2026 07:03:48 GMT",
+          "source_type": "News",
+          "source_name": "EurAsian Times",
+          "importance_score": 6,
+          "key_facts": [
+            "Indigenous propulsion and missile technologies (HSTDV, SFDR) showcased as pillars of self-reliance",
+            "QRSAM and Project Kusha positioned to create layered air defense capabilities",
+            "DRDO-driven programs aiming for 2028-2029 induction timelines and export potential"
+          ],
+          "summary": "EurAsian Times highlights India’s push toward defence self-reliance through indigenous propulsion, advanced missile technologies, and multi-layered air defense initiatives. Programs like HSTDV, SFDR, QRSAM, and Project Kusha are framed as foundational to future capabilities and exports, reflecting India’s broader Make in India and self-reliance ethos in strategic aerospace tech.",
+          "key_players_mentioned": [
+            "DRDO",
+            "HSTDV",
+            "SFDR",
+            "QRSAM",
+            "Project Kusha"
+          ],
+          "amca_keywords_found": [
+            "self-reliance",
+            "indigenous",
+            "DRDO",
+            "Kusha"
+          ],
+          "bucket": "Strategic Industry Partnerships & Global Collaboration"
+        }
+      ]
+    }
+  ],
+  "executive_summary": "This intelligence briefing consolidates recent developments across India's AMCA program and defence aerospace ecosystem through early-2026. The AMCA propulsion narrative is advancing with GTRE's EOI process for a 120 kN indigenous engine (AHTCE) to power AMCA Mk-2, signaling a strategic push toward self-reliant, high-thrust powerplants capable of stealth and supercruise. Concurrently, propulsion autonomy is framed within broader industry dynamics, including international collaboration on engine tech (e.g., F404/F414 legacy platforms) and leveraged global partnerships to accelerate indigenous capability. Strategic policy movements, notably Rafale procurements under Make in India and localisation targets, underscore India’s balanced approach to achieving air superiority while expanding domestic manufacturing capacity. MRO and sustainment expansion, as seen in HAL Dhruv coast guard deliveries, reinforce a robust Indian aerospace supply chain. Collectively, these developments reflect a synchronized trajectory: AMCA propulsion maturation, sovereign manufacturing ambitions, and expanded domestic industrial participation aligned with Atmanirbhar Bharat and Defence Exports aspirations.",
+  "citations": [
+    {
+      "citation_number": 1,
+      "source_type": "News",
+      "source_name": "Reuters",
+      "date": "Thu, 12 Feb 2026 09:01:02 GMT",
+      "title": "India backs $40 billion military upgrade with more Rafale fighters, Boeing P-8Is - Reuters",
+      "url": "https://www.reuters.com/world/india/india-clears-proposal-buy-114-rafale-fighter-jets-dassault-reports-say-2026-02-12/"
+    },
+    {
+      "citation_number": 2,
+      "source_type": "News",
+      "source_name": "Airforce Technology",
+      "date": "Wed, 18 Feb 2026 13:42:07 GMT",
+      "title": "India’s Self-Reliance campaign hinges on aircraft propulsion - Airforce Technology",
+      "url": "https://www.airforce-technology.com/features/indias-self-reliance-campaign-hinges-on-aircraft-propulsion/"
+    },
+    {
+      "citation_number": 3,
+      "source_type": "News",
+      "source_name": "FlightGlobal",
+      "date": "Thu, 05 Mar 2026 08:06:01 GMT",
+      "title": "HAL delivers four Dhruv Mk IIIs to Indian coast guard - FlightGlobal",
+      "url": "https://www.flightglobal.com/fixed-wing/hal-delivers-four-dhruv-mk-iiis-to-indian-coast-guard/166532.article"
+    },
+    {
+      "citation_number": 4,
+      "source_type": "News",
+      "source_name": "Defence.in",
+      "date": "Sun, 29 Mar 2026 19:15:00 GMT",
+      "title": "GTRE Concludes EOI Submissions for Development-cum-Production Partner of Indigenous 120kN High Thrust Aero Engine - Defence.in",
+      "url": "https://defence.in/threads/gtre-concludes-eoi-submissions-for-development-cum-production-partner-of-indigenous-120kn-high-thrust-aero-engine.17317/"
+    },
+    {
+      "citation_number": 5,
+      "source_type": "News",
+      "source_name": "EurAsian Times",
+      "date": "Sun, 08 Feb 2026 07:03:48 GMT",
+      "title": "Missile & Radar Success Fuels India’s Defense Self-Reliance & Exports; Ex-IAF Air Marshal Shares Key Details - EurAsian Times",
+      "url": "https://eurasiantimes.com/missile-ex-iaf-air-marshal-shares-key-details/"
+    }
+  ],
   "selected_articles": [
     {
-      "url": "https://www.janes.com/osint-insights/defence-news/air/governments-award-edgewing-first-gcap-contract",
-      "title": "Governments award Edgewing first GCAP contract - Janes",
-      "bucket": "defence_tech",
+      "citation_number": 1,
+      "url": "https://defence.in/threads/gtre-concludes-eoi-submissions-for-development-cum-production-partner-of-indigenous-120kn-high-thrust-aero-engine.17317/",
+      "title": "GTRE Concludes EOI Submissions for Development-cum-Production Partner of Indigenous 120kN High Thrust Aero Engine - Defence.in",
+      "published_date": "Sun, 29 Mar 2026 19:15:00 GMT",
+      "source_type": "News",
+      "source_name": "Defence.in",
+      "importance_score": 9,
+      "key_facts": [
+        "GTRE concludes EOI submissions for Development-cum-Production Partner of Indigenous 120kN High Thrust Aero Engine",
+        "120 kN class turbofan intended for AMCA Mk-2; Mk-1 to utilise existing GE engines",
+        "AMCA Mk-2 aims to achieve supercruise capabilities and enhanced maneuverability without compromising stealth",
+        "Indigenous powerplant development linked to AMCA and potential powerplants for future UCAVs"
+      ],
+      "summary": "GTRE has concluded Expressions of Interest for a development-cum-production partner to build an indigenous 120kN high-thrust aero engine, targeting the AMCA Mk-2. The AMCA Mk-1 fleet is expected to use GE-supplied engines, while the Mk-2 would rely on an indigenous powerplant to enable supercruise and high-maneuverability without sacrificing stealth. This marks a pivotal step in advancing India’s self-reliant propulsion ecosystem for fifth-generation and heavy UAV platforms, building on lessons from the Kaveri program and positioning GTRE within the AMCA propulsion ToT framework.",
+      "key_players_mentioned": [
+        "GTRE",
+        "AMCA Mk-2",
+        "AMCA Mk-1",
+        "GE"
+      ],
+      "amca_keywords_found": [
+        "AMCA Mk-2",
+        "120kN",
+        "AHTCE",
+        "indigenous engine",
+        "Mk-1",
+        "ToT"
+      ],
+      "bucket": "AMCA Program Updates & Consortium Developments"
+    },
+    {
+      "citation_number": 2,
+      "url": "https://www.airforce-technology.com/features/indias-self-reliance-campaign-hinges-on-aircraft-propulsion/",
+      "title": "India’s Self-Reliance campaign hinges on aircraft propulsion - Airforce Technology",
+      "published_date": "Wed, 18 Feb 2026 13:42:07 GMT",
+      "source_type": "News",
+      "source_name": "Airforce Technology",
+      "importance_score": 8,
+      "key_facts": [
+        "DRDO relies on imported GE F404/F414 engines for Tejas; indigenous propulsion challenges persist",
+        "Safran opened M88 engine MRO capability in Oct 2025; plan to support GTRE in developing a 120kN engine",
+        "India’s AMCA program hinges on sovereign propulsion; 120kN indigenous powerplant to be built using M88 technologies",
+        "Aatmanirbhar Bharat/self-reliance drive highlighted; sovereign aircraft propulsion remains a core bottleneck and strategic objective"
+      ],
+      "summary": "India’s propulsion autonomy remains central to the AMCA and broader defence aviation goals. The DRDO currently relies on GE F404/F414 for Tejas, while Safran’s M88 technology is being leveraged to bolster a sovereign 120kN engine. The 120kN unit aims to unlock AMCA Mk-2’s supercruise and stealth requirements, illustrating a concerted push toward indigenisation and ToT within a framework of selective foreign collaboration.",
+      "key_players_mentioned": [
+        "DRDO",
+        "GE",
+        "Safran",
+        "GTRE",
+        "AMCA"
+      ],
+      "amca_keywords_found": [
+        "AMCA",
+        "120kN",
+        "indigenous engine",
+        "ToT",
+        "M88"
+      ],
+      "bucket": "Engine Procurement & Foreign Collaboration"
+    },
+    {
+      "citation_number": 3,
+      "url": "https://www.reuters.com/world/india/india-clears-proposal-buy-114-rafale-fighter-jets-dassault-reports-say-2026-02-12/",
+      "title": "India backs $40 billion military upgrade with more Rafale fighters, Boeing P-8Is - Reuters",
+      "published_date": "Thu, 12 Feb 2026 09:01:02 GMT",
+      "source_type": "News",
+      "source_name": "Reuters",
+      "importance_score": 9,
+      "key_facts": [
+        "Defence Acquisition Council gave initial nod for a 3.6 trillion-rupee upgrade package",
+        "Includes procurement of more Rafale fighter jets and Boeing P-8I Neptune aircraft",
+        "HAL has nearly 180 of the advanced Mk-1A Tejas variants on order domestically but deliveries delayed due to GE engine supply issues",
+        "Package aligned with Modi government push for higher domestic manufacturing and Make in India"
+      ],
+      "summary": "New Delhi approved a 3.6 trillion-rupee package for upgrading armed forces, including additional Rafale fighters and P-8I aircraft, as part of a broader domestic manufacturing push. HAL’s Tejas Mk-1A delivery delays are attributed to engine supply constraints at GE, underscoring the criticality of stable propulsion supply in India’s defence industrialization. The move coincides with a visit by French President Macron and reflects strategic emphasis on domestic co-production and export-readiness in defence aerospace.",
+      "key_players_mentioned": [
+        "DRDO",
+        "GE Aerospace",
+        "HAL",
+        "Rafale",
+        "P-8I",
+        "Dassault Aviation"
+      ],
+      "amca_keywords_found": [
+        "Rafale",
+        "Make in India",
+        "domestic manufacturing",
+        "ToT"
+      ],
+      "bucket": "Strategic & Policy Developments (Make in India, Exports, Rafale)"
+    },
+    {
+      "citation_number": 5,
+      "url": "https://aerotime.aero/articles/india-39-billion-purchase-114-rafale-fighter-jet",
+      "title": "India approves $39 billion purchase of 114 Rafale jets ahead of Macron visit - AeroTime",
+      "published_date": "Thu, 12 Feb 2026 13:32:35 GMT",
+      "source_type": "News",
+      "source_name": "AeroTime",
       "importance_score": 7,
       "key_facts": [
-        "Edgewing has been awarded the first GCAP contract.",
-        "GCAP is a trilateral defence program with potential participation by additional nations including India.",
-        "The contract covers key design and engineering activities to accelerate momentum and delivery."
+        "AoN approved for 114 Rafale MRFA jets; majority to be manufactured in India under Make in India",
+        "Rafale backlog and 50% localization target discussed; production ramp-up considerations include in-country value",
+        "Contextual link to defence diplomacy ahead of Macron visit; Rafale orders interwoven with domestic industrial participation"
       ],
-      "summary": "Edgewing has been awarded the first GCAP contract, kicking off the trilateral programme and focusing on design and engineering activities to accelerate momentum and delivery. The GCAP framework indicates potential future participation by other nations, with India discussed as a possible partner.",
+      "summary": "AeroTime reports India’s AoN to procure 114 Rafale MRFA jets, with a strong emphasis on local production under Make in India. The piece notes a target of increasing in-country localization to around 50% for future Rafale batches and highlights Dassault’s in-country collaboration with Tata Advanced Systems. This procurement signals continuity in India’s multi-year plan to bolster air superiority while expanding domestic industry participation and export potential in the defence aerospace sector.",
       "key_players_mentioned": [
-        "Edgewing",
-        "GCAP"
+        "Dassault Aviation",
+        "TATA Advanced Systems",
+        "Rafale",
+        "India (MoD)",
+        "France"
       ],
-      "amca_keywords_found": []
+      "amca_keywords_found": [
+        "Rafale",
+        "Make in India",
+        "local production",
+        "in-country localization"
+      ],
+      "bucket": "Strategic & Policy Developments (Make in India, Exports, Rafale)"
     },
     {
-      "url": "https://www.business-standard.com/blueprint-defence-magazine/news/indian-army-charts-future-of-unmanned-systems-with-new-technology-roadmap-126040601154_1.html",
-      "title": "Indian Army charts future of unmanned systems with new technology roadmap",
-      "bucket": "defence_tech",
+      "citation_number": 4,
+      "url": "https://www.flightglobal.com/fixed-wing/hal-delivers-four-dhruv-mk-iiis-to-indian-coast-guard/166532.article",
+      "title": "HAL delivers four Dhruv Mk IIIs to Indian coast guard - FlightGlobal",
+      "published_date": "Thu, 05 Mar 2026 08:06:01 GMT",
+      "source_type": "News",
+      "source_name": "FlightGlobal",
+      "importance_score": 7,
+      "key_facts": [
+        "HAL delivers four Dhruv Mk IIIs to Indian Coast Guard",
+        "Contract worth INR 29 billion for six additional helicopters; Dhruv is powered by HAL/Safran Shakti-1H1 turboshafts ( Ardiden 1 lineage)",
+        "Induction aims to enhance safety and protection of offshore infrastructure and maritime environment"
+      ],
+      "summary": "Hindustan Aeronautics Limited has delivered four Dhruv Mk IIIs to the Indian Coast Guard under a contract valued at INR 29 billion. The Dhruv is powered by HAL/Safran Shakti-1H1 turboshafts, derived from the Ardiden family, and the contract’s scale reinforces HAL’s rotorcraft sustainment and coast guard mobility capabilities. This expansion supports India’s domestic rotorcraft production and MRO footprint as part of broader defence manufacturing goals.",
+      "key_players_mentioned": [
+        "HAL",
+        "Coast Guard",
+        "Safran",
+        "Shakti-1H1"
+      ],
+      "amca_keywords_found": [
+        "Dhruv Mk III",
+        "coast guard",
+        "HAL/Safran",
+        "turboshaft"
+      ],
+      "bucket": "Defence Manufacturing, MRO & Supply Chain"
+    },
+    {
+      "citation_number": 5,
+      "url": "https://eurasiantimes.com/missile-ex-iaf-air-marshal-shares-key-details/",
+      "title": "Missile & Radar Success Fuels India’s Defense Self-Reliance & Exports; Ex-IAF Air Marshal Shares Key Details - EurAsian Times",
+      "published_date": "Sun, 08 Feb 2026 07:03:48 GMT",
+      "source_type": "News",
+      "source_name": "EurAsian Times",
       "importance_score": 6,
       "key_facts": [
-        "The roadmap details 30 types of unmanned aerial systems (UAS) and loitering munitions across five categories.",
-        "A technology roadmap was unveiled to guide development and procurement of UAS.",
-        "Aims to mass-produce low-cost drones and strengthen India’s drone ecosystem under Make in India / Atmanirbhar Bharat.",
-        "Emphasizes greater industry participation from startups, MSMEs and academia."
+        "Indigenous propulsion and missile technologies (HSTDV, SFDR) showcased as pillars of self-reliance",
+        "QRSAM and Project Kusha positioned to create layered air defense capabilities",
+        "DRDO-driven programs aiming for 2028-2029 induction timelines and export potential"
       ],
-      "summary": "The Indian Army unveiled a technology roadmap covering 30 UAS and loitering munitions across five categories, alongside a plan to guide development and procurement. The initiative aims to enable mass, affordable drone production and boost India’s drone ecosystem with wider industry participation under Make in India / Atmanirbhar Bharat.",
-      "key_players_mentioned": [],
-      "amca_keywords_found": []
-    },
-    {
-      "url": "https://www.newsonair.gov.in/indian-army-launches-technology-roadmap-for-unmanned-aerial-system/",
-      "title": "Indian Army launches technology roadmap for Unmanned Aerial System",
-      "bucket": "defence_tech",
-      "importance_score": 5,
-      "key_facts": [
-        "The Indian Army launched a technology roadmap for Unmanned Aerial Systems (UAS) and loitering munitions.",
-        "The roadmap provides clear visibility to industry, academia and R&D institutions to align investments with identified priorities.",
-        "Highlights a whole-of-nation approach to building a resilient drone ecosystem."
+      "summary": "EurAsian Times highlights India’s push toward defence self-reliance through indigenous propulsion, advanced missile technologies, and multi-layered air defense initiatives. Programs like HSTDV, SFDR, QRSAM, and Project Kusha are framed as foundational to future capabilities and exports, reflecting India’s broader Make in India and self-reliance ethos in strategic aerospace tech.",
+      "key_players_mentioned": [
+        "DRDO",
+        "HSTDV",
+        "SFDR",
+        "QRSAM",
+        "Project Kusha"
       ],
-      "summary": "The Indian Army released a technology roadmap for UAS and loitering munitions, outlining priority areas and providing actionable visibility to industry, academia and research bodies to channel investments. The initiative reinforces a whole-of-nation approach to developing India’s drone ecosystem.",
-      "key_players_mentioned": [],
-      "amca_keywords_found": []
+      "amca_keywords_found": [
+        "self-reliance",
+        "indigenous",
+        "DRDO",
+        "Kusha"
+      ],
+      "bucket": "Strategic Industry Partnerships & Global Collaboration"
     }
   ]
 }

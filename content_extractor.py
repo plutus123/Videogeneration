@@ -227,16 +227,24 @@ def _summarize_article(title: str, content: str, category: str) -> str:
     client = get_azure_client()
     deployment = get_chat_deployment()
     prompt = (
-        f"You are an aviation and defence industry analyst specializing in AMCA (Advanced Medium Combat Aircraft) "
-        f"and Indian defence programs. "
+        f"You are an aviation and defence industry analyst specializing in India's AMCA "
+        f"(Advanced Medium Combat Aircraft) program and Indian defence aerospace.\n\n"
+        f"AMCA-related keywords to focus on:\n"
+        f"Tenders, RFI, RFQ, airframe, engine, Thrust, 5th/6th Gen tech, "
+        f"Transfer of Technology, prototype, MRO, manufacturing unit, R&D, R&T, "
+        f"engine production, Test bed, Test facility, Assembly line, FCAS, GCAP, "
+        f"Make in India, Self Reliance, Supply chain, stealth, combat aircraft, "
+        f"fighter jet, unmanned systems, loitering munitions, defence export, "
+        f"defence procurement, Kaveri engine.\n\n"
+        f"Key stakeholders: DRDO, GTRE, HAL, Tata Advanced Systems, L&T, "
+        f"Bharat Forge, Adani Defence, Reliance Defence, BEL, Mazagon Dock, "
+        f"Indian Air Force, Indian Army, Indian Navy.\n\n"
         f"Summarize the following article in 150-300 words. "
         f"Preserve ALL key facts: numbers, dollar figures, percentages, dates, "
-        f"company names, product names, and strategic details. "
-        f"Focus on what matters for India's AMCA program, defence manufacturing, "
-        f"and the key stakeholders (DRDO, GTRE, HAL, Tata, L&T, Bharat Forge, Adani Defence, Reliance).\n\n"
+        f"company names, product names, and strategic details.\n\n"
         f"Category: {category}\n"
         f"Title: {title}\n\n"
-        f"Article:\n{content[:8000]}\n\n"
+        f"Article:\n{content}\n\n"
         f"Summary:"
     )
     try:
@@ -246,6 +254,9 @@ def _summarize_article(title: str, content: str, category: str) -> str:
             timeout=60,
         )
         summary = resp.choices[0].message.content.strip()
+        # Refusal phrases: GPT outputs these when the content is garbage
+        # (e.g., navigation menus, search result pages, paywalled stubs).
+        # Returning None tells downstream code the summary failed — not a real article.
         refusal_phrases = [
             "i'm unable to", "i cannot provide", "i am unable to",
             "isn't a single article", "not a coherent article",

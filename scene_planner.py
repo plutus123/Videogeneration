@@ -223,47 +223,68 @@ def save_scene_plan(plan, output_path):
 def build_context_from_curated(curated_articles):
     """Build scene planner context string from curated articles.
 
-    Organizes curated articles into sections by bucket and formats them
-    for the GPT scene planner prompt.
+    Handles both formats:
+      - AlphaSense-style: thematic_sections with articles
+      - Legacy flat: selected_articles with buckets
     """
-    articles = curated_articles.get("selected_articles", [])
-
-    # Group by bucket
-    buckets = {"amca_program": [], "key_players": [], "defence_tech": []}
-    for article in articles:
-        b = article.get("bucket", "defence_tech")
-        if b in buckets:
-            buckets[b].append(article)
-        else:
-            buckets["defence_tech"].append(article)
-
-    bucket_labels = {
-        "amca_program": "Defence",
-        "key_players": "Defence",
-        "defence_tech": "Defence",
-    }
-
     parts = []
-    total_articles = len(articles)
-    parts.append(f"\n=== VIDEO HAS {len([b for b in buckets if buckets[b]])} SECTIONS ({total_articles} articles total) ===")
 
-    section_idx = 1
-    for bucket_key, articles_list in buckets.items():
-        if not articles_list:
-            continue
-        label = bucket_labels.get(bucket_key, bucket_key.upper())
-        parts.append(f"\n--- SECTION {section_idx}: {label} ({len(articles_list)} articles) ---")
+    # AlphaSense-style format (thematic_sections)
+    if "thematic_sections" in curated_articles and curated_articles["thematic_sections"]:
+        sections = curated_articles["thematic_sections"]
+        total = sum(len(s.get("articles", [])) for s in sections)
+        parts.append(f"\n=== VIDEO HAS {len(sections)} SECTIONS ({total} articles total) ===")
 
-        for article in articles_list:
-            parts.append(
-                f"\nARTICLE: {article.get('title', 'N/A')}\n"
-                f"Source URL: {article.get('url', 'N/A')}\n"
-                f"Score: {article.get('importance_score', '?')}/10\n"
-                f"Key Players: {', '.join(article.get('key_players_mentioned', []))}\n"
-                f"Keywords: {', '.join(article.get('amca_keywords_found', []))}\n"
-                f"Summary: {article.get('summary', '')}\n"
-                f"Key Facts: {json.dumps(article.get('key_facts', []))}\n"
-            )
-        section_idx += 1
+        for idx, section in enumerate(sections, 1):
+            articles = section.get("articles", [])
+            if not articles:
+                continue
+            title = section.get("section_title", f"Section {idx}")
+            parts.append(f"\n--- SECTION {idx}: {title} ({len(articles)} articles) ---")
+            if section.get("section_summary"):
+                parts.append(f"Section Summary: {section['section_summary']}")
+
+            for article in articles:
+                parts.append(
+                    f"\nARTICLE [{article.get('citation_number', '?')}]: {article.get('title', 'N/A')}\n"
+                    f"Source URL: {article.get('url', 'N/A')}\n"
+                    f"Source: {article.get('source_name', '')} ({article.get('source_type', '')})\n"
+                    f"Score: {article.get('importance_score', '?')}/10\n"
+                    f"Key Players: {', '.join(article.get('key_players_mentioned', []))}\n"
+                    f"Keywords: {', '.join(article.get('amca_keywords_found', []))}\n"
+                    f"Summary: {article.get('summary', '')}\n"
+                    f"Key Facts: {json.dumps(article.get('key_facts', []))}\n"
+                )
+    else:
+        # Legacy flat format
+        articles = curated_articles.get("selected_articles", [])
+        buckets = {"amca_program": [], "key_players": [], "defence_tech": []}
+        for article in articles:
+            b = article.get("bucket", "defence_tech")
+            if b in buckets:
+                buckets[b].append(article)
+            else:
+                buckets["defence_tech"].append(article)
+
+        total = len(articles)
+        parts.append(f"\n=== VIDEO HAS {len([b for b in buckets if buckets[b]])} SECTIONS ({total} articles total) ===")
+
+        section_idx = 1
+        for bucket_key, articles_list in buckets.items():
+            if not articles_list:
+                continue
+            parts.append(f"\n--- SECTION {section_idx}: Defence ({len(articles_list)} articles) ---")
+            for article in articles_list:
+                parts.append(
+                    f"\nARTICLE: {article.get('title', 'N/A')}\n"
+                    f"Source URL: {article.get('url', 'N/A')}\n"
+                    f"Score: {article.get('importance_score', '?')}/10\n"
+                    f"Key Players: {', '.join(article.get('key_players_mentioned', []))}\n"
+                    f"Keywords: {', '.join(article.get('amca_keywords_found', []))}\n"
+                    f"Summary: {article.get('summary', '')}\n"
+                    f"Key Facts: {json.dumps(article.get('key_facts', []))}\n"
+                )
+            section_idx += 1
 
     return "\n".join(parts)
+

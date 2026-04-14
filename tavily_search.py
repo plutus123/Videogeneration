@@ -1,15 +1,16 @@
-"""Tavily-powered news search with whitelisted domains and weekly date filtering.
+"""Tavily-powered news search for AMCA/Indian defence aerospace.
 
-Supports AMCA-related keyword search and key player/stakeholder/vendor search.
-Date filtering: Monday of current week → today (weekly window).
+Covers ALL user-specified search dimensions:
+  1. AMCA-specific direct queries
+  2. All AMCA-related technology & procurement keyword queries
+  3. Key player/stakeholder/vendor queries
 
-Post-search pre-filtering: Discards obviously non-aerospace articles
-BEFORE they reach GPT curation, using keyword-based scoring.
+Date filtering: Quarterly (90 days) by default.
+No hardcoded pre-filtering — the LLM curation agent handles intelligent filtering.
 """
 
 import os
 import json
-import re
 from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
@@ -18,140 +19,200 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ---------------------------------------------------------------------------
-# Whitelisted domains (news + government)
+# Whitelisted domains (news + government + defence portals)
 # ---------------------------------------------------------------------------
 DEFAULT_WHITELIST = [
     # Indian news / defence portals
     "defence.in",
     "defencenews.in",
     "idrw.org",
-    "aljazeera.com",
+    "defencewatch.in",
+    "indiandefencereview.com",
+    "defencexp.com",
+    "forceindia.net",
+    "bharatshakti.in",
+    "spsmai.com",
+    "spsnavalforces.com",
+    "spslandforces.com",
+    "spsaviation.com",
+    # Major Indian news outlets
     "economictimes.indiatimes.com",
     "m.economictimes.com",
+    "timesofindia.indiatimes.com",
+    "thehindu.com",
+    "hindustantimes.com",
+    "indianexpress.com",
+    "business-standard.com",
+    "livemint.com",
+    "ndtv.com",
+    "moneycontrol.com",
+    "theprint.in",
+    "wionews.com",
+    "news18.com",
+    "firstpost.com",
+    "deccanherald.com",
+    "newsonair.gov.in",
+    "aninews.in",
+    # Industry / trade media
     "geaerospace.com",
     "manufacturingtodayindia.com",
     "storyboard18.com",
-    "defencewatch.in",
-    "thehindu.com",
-    "timesofindia.indiatimes.com",
-    "newsonair.gov.in",
-    "deccanherald.com",
-    "business-standard.com",
-    "indianexpress.com",
     "visionias.in",
+    "aljazeera.com",
+    # International defence / aerospace
     "reuters.com",
     "bloomberg.com",
     "flightglobal.com",
     "janes.com",
+    "defensenews.com",
+    "aviationweek.com",
+    "thedrive.com",
+    "bulgarianmilitary.com",
+    "eurasiantimes.com",
+    # OEM / Industry sites
     "rolls-royce.com",
     "airbus.com",
     "boeing.com",
-    "livemint.com",
-    "ndtv.com",
-    "moneycontrol.com",
-    "aninews.in",
-    # Government websites (whitelisted)
+    "safran-group.com",
+    "hal-india.co.in",
+    "larsentoubro.com",
+    "bharatforge.com",
+    "bel-india.in",
+    "midhani-india.in",
+    "ptcindustries.com",
+    # Government websites
     "pib.gov.in",
     "mod.gov.in",
     "mea.gov.in",
+    "drdo.gov.in",
+    "ada.gov.in",
 ]
 
 # ---------------------------------------------------------------------------
-# AMCA-related keyword search queries (targeted, less noise)
+# AMCA DIRECT search queries
+# ---------------------------------------------------------------------------
+# These run WITHOUT domain restriction to catch niche stories from any source
+AMCA_DIRECT_QUERIES = [
+    "AMCA fighter jet India latest news",
+    "AMCA Advanced Medium Combat Aircraft India update",
+    "AMCA prototype development India ADA",
+    "AMCA Mk1 Mk2 India stealth fighter engine",
+    "AMCA consortium shortlisting India L&T Tata Bharat Forge",
+    "AMCA HAL exclusion consortium bid India",
+    "India 5th generation fighter aircraft AMCA stealth",
+    "India fifth generation stealth fighter development DRDO",
+    "India 6th generation fighter programme join",
+    "AMCA stealth engine intake aerodynamic breakthrough",
+    "AMCA stealth missile Astra folding fin internal",
+    "AMCA budget Rs 150 billion prototype funding India",
+    "HAL Su-57 India co-production stealth fighter",
+    "India fighter jet race private sector AMCA",
+]
+
+# ---------------------------------------------------------------------------
+# ALL AMCA-related keyword queries
+# User-specified keywords:
+#   Tenders, RFI, RFQ, airframe, engine, Thrust, 5th/6th Gen tech,
+#   Transfer of Technology, prototype, MRO, manufacturing unit, R&D, R&T,
+#   engine production, Test bed, Test facility, Assembly line,
+#   Make in India, Self Reliance, Supply chain
 # ---------------------------------------------------------------------------
 AMCA_KEYWORD_QUERIES = [
-    # Direct AMCA queries (highest priority)
-    "AMCA fighter jet India latest news",
-    "AMCA Advanced Medium Combat Aircraft India",
-    "AMCA prototype test India 2026",
-    "India 5th generation fighter aircraft",
-    "India fifth generation stealth fighter",
-    # Defence procurement & manufacturing (India-specific)
-    "India defence procurement tenders RFI",
-    "India defence manufacturing Make in India",
-    "Atmanirbhar Bharat defence aerospace",
-    "India defence export order",
-    "Indian Air Force fighter aircraft new",
-    # Competitor programs (directly relevant to AMCA context)
-    "GCAP fighter jet contract",
-    "FCAS future combat air system Europe",
-    # Strategic defence tech (India focus)
-    "India defence Transfer of Technology",
-    "India fighter engine development Kaveri",
-    "India defence test facility prototype",
+    # Tenders, RFI, RFQ
+    "India defence tenders aerospace fighter RFI",
+    "India defence RFQ aerospace procurement",
+    "India defence RFP fighter aircraft bid",
+    # Airframe
+    "India fighter aircraft airframe development indigenous",
+    "India airframe manufacturing aerospace defence",
+    # Engine, Thrust, Engine Production
+    "India defence engine development thrust fighter",
+    "Kaveri engine GTRE India latest",
+    "India jet engine production manufacturing indigenous",
+    "India aero engine development programme",
+    "GE F414 engine India Transfer of Technology",
+    "Safran engine India AMCA co-development",
+    # 5th/6th Gen tech
+    "India stealth technology 5th generation fighter",
+    "sixth generation fighter aircraft technology India",
+    "India stealth fighter radar evading technology",
+    # Transfer of Technology
+    "India defence Transfer of Technology aerospace deal",
+    "India ToT defence agreement aerospace",
+    # Prototype
+    "India defence prototype fighter aircraft development",
+    "AMCA prototype ADA DRDO development",
+    # MRO
+    "India defence MRO maintenance repair overhaul",
+    "India aerospace MRO facility expansion",
+    # Manufacturing unit, Assembly line
+    "India defence manufacturing unit aerospace new",
+    "India defence assembly line fighter aircraft production",
+    "India defence production facility aerospace",
+    # R&D, R&T
+    "India defence R&D research development aerospace",
+    "India defence research technology aerospace innovation",
+    "ADA DRDO research AMCA stealth technology",
+    # Test bed, Test facility
+    "India defence test bed test facility aerospace",
+    "India aerospace wind tunnel testing facility",
+    "India defence testing facility prototype validation",
+    # Make in India, Self Reliance
+    "Make in India defence aerospace manufacturing latest",
+    "Atmanirbhar Bharat defence self reliance aerospace",
+    "India defence indigenisation self reliance programme",
+    # Supply chain
+    "India defence supply chain aerospace component",
+    "India defence vendor supply ecosystem aerospace",
+    # Defence export
+    "India defence export order aerospace latest",
+    "India defence export deal contract",
+    # Weapons / Missiles for AMCA
+    "Astra missile India AMCA integration",
+    "Astra Mk2 Mk3 India BVRAAM ramjet",
+    "India air-to-air missile stealth fighter internal carriage",
+    # Materials / Forging
+    "India aerospace materials titanium superalloy indigenous",
+    "India defence forging aerospace component manufacturing",
+    "PTC Industries Aerolloy titanium forging India aerospace",
+    "MIDHANI airworthiness certification aero engine alloy India",
+    "India open die forging aerospace superalloy titanium",
+    # Budget / Financial
+    "India defence budget FY27 capital outlay aerospace",
+    "India defence capital expenditure Make in India",
 ]
 
 # ---------------------------------------------------------------------------
 # Key Player / Stakeholder / Vendor search queries
 # ---------------------------------------------------------------------------
 KEY_PLAYER_QUERIES = [
-    "DRDO AMCA India fighter development",
-    "GTRE Kaveri engine India",
-    "HAL Hindustan Aeronautics fighter AMCA",
-    "Tata Advanced Systems defence India",
-    "L&T defence aerospace India contract",
-    "Bharat Forge defence India",
-    "Adani Defence India aerospace",
+    "DRDO AMCA India fighter development latest",
+    "DRDO ADA Aeronautical Development Agency India",
+    "GTRE Kaveri engine India 120kN thrust development",
+    "GTRE EOI aero engine development production partner India",
+    "HAL Hindustan Aeronautics fighter Tejas AMCA order",
+    "HAL India defence aerospace contract backlog",
+    "Tata Advanced Systems TASL defence India AMCA bid",
+    "L&T defence aerospace India contract order",
+    "L&T BEL joint venture AMCA consortium India",
+    "Bharat Forge defence India aerospace forging titanium",
+    "Bharat Forge BEML Data Patterns AMCA consortium",
+    "Adani Defence India aerospace manufacturing Leonardo",
     "Reliance Defence India aerospace",
+    "BEL Bharat Electronics defence India order radar",
+    "Mazagon Dock shipbuilding India defence naval submarine",
+    "PTC Industries Aerolloy titanium forging aerospace India",
+    "PTC Industries Lucknow intelligent forging system",
+    "MIDHANI India aero engine alloy airworthiness certification",
+    "GE Aerospace India F414 engine $1.5 billion deal ToT",
+    "GE F414 HAL co-production technology transfer India",
+    "Safran India AMCA Mk2 engine $7 billion co-development",
+    "Safran GTRE engine joint venture 110kN 140kN India",
+    "Rolls-Royce India fighter engine AMCA push",
 ]
 
 # Combine all queries
-SEARCH_QUERIES = AMCA_KEYWORD_QUERIES + KEY_PLAYER_QUERIES
-
-# ---------------------------------------------------------------------------
-# Post-search pre-filter: reject obviously non-aerospace articles
-# ---------------------------------------------------------------------------
-# These words in title STRONGLY indicate irrelevant articles
-REJECT_TITLE_PATTERNS = [
-    r"\bTCS\b", r"\bInfosys\b", r"\bWipro\b", r"\bHCL Tech\b",
-    r"\bcricket\b", r"\bIPL\b", r"\bbollywood\b", r"\bentertainment\b",
-    r"\bcensus\b", r"\bagriculture\b", r"\bfarm fair\b", r"\bfertiliser\b",
-    r"\bstock market\b", r"\bsensex\b", r"\bnifty\b", r"\bmutual fund\b",
-    r"\bhome loan\b", r"\bEMI\b", r"\bpersonal finance\b",
-    r"\breal estate\b", r"\bproperty\b",
-    r"\bworkforce\b.*\bchurn\b", r"\btalent\b.*\battrition\b",
-    r"\bjobs\b.*\bAI\b", r"\bAI\b.*\bjobs\b",
-    r"\brepo rate\b", r"\bRBI\b.*\brate\b",
-    r"\bharikishan\b", r"\bvidisha\b",
-    r"\bBSE\b.*\bshares\b", r"\bshares\b.*\bmuted\b",
-    r"\bIPO\b(?!.*(?:defence|aerospace|fighter|DRDO|HAL))",
-]
-
-# These words in title indicate RELEVANT articles (keep even if matched above)
-KEEP_TITLE_PATTERNS = [
-    r"\bAMCA\b", r"\bfighter\b", r"\bstealth\b", r"\bdefence\b", r"\bdefense\b",
-    r"\baerospace\b", r"\bDRDO\b", r"\bHAL\b", r"\bGTRE\b", r"\bKaveri\b",
-    r"\bGCAP\b", r"\bFCAS\b", r"\bdrone\b", r"\bunmanned\b", r"\bmissile\b",
-    r"\bIndian Air Force\b", r"\bIndian Army\b", r"\bIndian Navy\b",
-    r"\bBrahMos\b", r"\bTejas\b", r"\bwarship\b", r"\bsubmarine\b",
-    r"\bfighter jet\b", r"\bcombat aircraft\b", r"\bweapon\b",
-    r"\btorpedo\b", r"\bfrigate\b", r"\bdestroyer\b",
-    r"\baircraft carrier\b", r"\bhelicopter\b.*\bmilitary\b",
-    r"\bTransfer of Technology\b", r"\bMake in India\b.*\bdefence\b",
-    r"\bdefence export\b", r"\bdefence procurement\b",
-    r"\bRolls.Royce\b", r"\bGE Aerospace\b", r"\bSafran\b",
-]
-
-
-def _is_aerospace_relevant(title):
-    """Quick check: is this title about aerospace/defence?
-
-    Returns True if article should PASS (keep), False if it should be REJECTED.
-    """
-    title_lower = title.lower()
-
-    # First check: if title matches a KEEP pattern, always pass
-    for pattern in KEEP_TITLE_PATTERNS:
-        if re.search(pattern, title, re.IGNORECASE):
-            return True
-
-    # Second check: if title matches a REJECT pattern, reject
-    for pattern in REJECT_TITLE_PATTERNS:
-        if re.search(pattern, title, re.IGNORECASE):
-            return False
-
-    # Default: pass through to GPT curation (let GPT decide)
-    return True
+SEARCH_QUERIES = AMCA_DIRECT_QUERIES + AMCA_KEYWORD_QUERIES + KEY_PLAYER_QUERIES
 
 
 def _get_tavily_client():
@@ -168,24 +229,26 @@ def _get_tavily_client():
     return TavilyClient(api_key=api_key)
 
 
+def get_quarterly_date_range():
+    """Calculate a 90-day (quarterly) lookback window.
+
+    Returns:
+        Tuple of (start_date, today_date, days_back)
+    """
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    start = today - timedelta(days=90)
+    return start, today, 90
+
+
 def get_weekly_date_range():
     """Calculate the Monday→today date range for current week filtering.
-
-    Example: If today is Friday April 10, returns:
-        monday = April 6 (Monday)
-        today  = April 10 (Friday)
-        days_back = 4  (Friday minus Monday)
 
     Returns:
         Tuple of (monday_date, today_date, days_back)
     """
     today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    # weekday(): Monday=0, Tuesday=1, ..., Sunday=6
     days_since_monday = today.weekday()
     monday = today - timedelta(days=days_since_monday)
-    # days_back is used by Tavily: how many days back from today to search
-    # We want Mon→today, so days_back = days_since_monday
-    # But on Monday itself, days_back=0 means "today only", so use at least 1
     days_back = max(days_since_monday, 1)
     return monday, today, days_back
 
@@ -194,25 +257,23 @@ def search_aviation_news(
     queries=None,
     whitelist=None,
     days_back=None,
-    max_results_per_query=5,
+    max_results_per_query=10,
     save_path="tavily_results.json",
+    date_mode="quarter",
 ):
-    """Search whitelisted sites for AMCA/defence news within the current week.
+    """Search whitelisted sites for AMCA/defence news.
 
-    Date filtering:
-        Uses Monday of current week → today as the search window.
-        The `days_back` parameter is auto-calculated to match this weekly window
-        unless explicitly overridden.
-
-    Post-search pre-filtering:
-        Discards obviously non-aerospace articles BEFORE sending to GPT curation.
+    No hardcoded pre-filtering — all articles that Tavily returns from the
+    whitelisted domains are passed through. The LLM curation agent does the
+    intelligent filtering downstream.
 
     Args:
         queries:   List of search query strings. Defaults to SEARCH_QUERIES.
         whitelist: List of domain strings. Defaults to DEFAULT_WHITELIST.
         days_back: How many days back to search. Auto-calculated if None.
-        max_results_per_query: Max results per query from Tavily.
+        max_results_per_query: Max results per query from Tavily (default: 10).
         save_path: Where to save raw search results.
+        date_mode: "quarter" (default, 90 days) or "week" (Monday-today).
 
     Returns:
         List of unique article dicts: {url, title, content, score, published_date, domain}
@@ -224,82 +285,88 @@ def search_aviation_news(
     queries = queries or SEARCH_QUERIES
     whitelist = whitelist or DEFAULT_WHITELIST
 
-    # Calculate weekly date range
-    monday, today, auto_days_back = get_weekly_date_range()
+    # Calculate date range based on mode
+    if date_mode == "week":
+        start_date, today, auto_days_back = get_weekly_date_range()
+    else:
+        start_date, today, auto_days_back = get_quarterly_date_range()
+
     if days_back is None:
         days_back = auto_days_back
 
-    print(f"  Date filter: {monday.strftime('%A %d %B %Y')} → {today.strftime('%A %d %B %Y')} (days_back={days_back})")
+    print(f"  Date range: {start_date.strftime('%d %B %Y')} → {today.strftime('%d %B %Y')} ({days_back} days)")
 
     all_results = []
     seen_urls = set()
 
-    for query in queries:
-        print(f"  Searching: {query}")
-        try:
-            response = client.search(
-                query=query,
-                search_depth="advanced",
-                topic="news",
-                max_results=max_results_per_query,
-                include_domains=whitelist,
-                days=days_back,
-                include_raw_content=True,
-            )
-            results = response.get("results", [])
-            for r in results:
-                url = r.get("url", "")
-                if url in seen_urls:
-                    continue
-                seen_urls.add(url)
-                domain = urlparse(url).netloc.replace("www.", "")
-                all_results.append({
-                    "url": url,
-                    "title": r.get("title", ""),
-                    "content": r.get("content", ""),
-                    "raw_content": r.get("raw_content", ""),
-                    "score": r.get("score", 0),
-                    "published_date": r.get("published_date", ""),
-                    "domain": domain,
-                })
-            print(f"    Found {len(results)} results ({len(seen_urls)} unique total)")
-        except Exception as e:
-            print(f"    Search failed for '{query}': {type(e).__name__}: {e}")
+    def _run_queries(query_list, use_whitelist, label):
+        """Run a batch of queries and collect results."""
+        print(f"\n  --- {label}: {len(query_list)} queries, max {max_results_per_query} each ---")
+        for query in query_list:
+            print(f"  Searching: {query}")
+            try:
+                search_params = {
+                    "query": query,
+                    "search_depth": "advanced",
+                    "topic": "news",
+                    "max_results": max_results_per_query,
+                    "days": days_back,
+                    "include_raw_content": True,
+                }
+                if use_whitelist:
+                    search_params["include_domains"] = whitelist
+                response = client.search(**search_params)
+                results = response.get("results", [])
+                for r in results:
+                    url = r.get("url", "")
+                    if url in seen_urls:
+                        continue
+                    seen_urls.add(url)
+                    domain = urlparse(url).netloc.replace("www.", "")
+                    all_results.append({
+                        "url": url,
+                        "title": r.get("title", ""),
+                        "content": r.get("content", ""),
+                        "raw_content": r.get("raw_content", ""),
+                        "score": r.get("score", 0),
+                        "published_date": r.get("published_date", ""),
+                        "domain": domain,
+                    })
+                print(f"    Found {len(results)} results ({len(seen_urls)} unique total)")
+            except Exception as e:
+                print(f"    Search failed for '{query}': {type(e).__name__}: {e}")
 
-    # ─── Post-filter 1: Date window (Mon→today) ─────────────────────
+    # PASS 1: AMCA-specific queries WITHOUT domain restriction
+    # These are highly specific — we want to catch niche stories from any source
+    _run_queries(AMCA_DIRECT_QUERIES, use_whitelist=False, label="Pass 1: AMCA-specific (open web)")
+
+    # PASS 2: Keyword + key player queries WITH domain whitelist
+    # These are broader — we restrict to trusted sources for quality
+    _run_queries(AMCA_KEYWORD_QUERIES + KEY_PLAYER_QUERIES, use_whitelist=True, label="Pass 2: Keywords + Players (whitelisted)")
+
+
+    # ─── Post-filter: Date window only ───────────────────────────────
+    # No content-based filtering — let the LLM curation agent handle that.
     filtered_results = []
+    date_rejected = 0
     for article in all_results:
         pub = article.get("published_date", "")
         if pub:
             try:
-                # Tavily returns RFC-2822 dates like "Mon, 06 Apr 2026 02:39:09 GMT"
                 try:
                     pub_date = parsedate_to_datetime(pub).replace(tzinfo=None)
                 except Exception:
-                    # Fallback to ISO format
                     pub_date = datetime.fromisoformat(pub.replace("Z", "+00:00")).replace(tzinfo=None)
-                if pub_date.date() < monday.date():
-                    print(f"    ✗ Date-filtered: {article.get('title', '')[:60]} [{pub}]")
+                if pub_date.date() < start_date.date():
+                    date_rejected += 1
                     continue
             except (ValueError, TypeError):
                 pass  # If date parsing fails, keep the article
         filtered_results.append(article)
 
-    print(f"\n  Date filter: {len(all_results)} → {len(filtered_results)} articles")
+    print(f"\n  Post-filter: {len(all_results)} → {len(filtered_results)} articles ({date_rejected} date-rejected)")
 
-    # ─── Post-filter 2: Aerospace relevance (title-based) ───────────
-    aerospace_results = []
-    rejected_count = 0
-    for article in filtered_results:
-        title = article.get("title", "")
-        if _is_aerospace_relevant(title):
-            aerospace_results.append(article)
-        else:
-            rejected_count += 1
-            print(f"    ✗ Non-aerospace: {title[:70]}")
-
-    print(f"  Aerospace filter: {len(filtered_results)} → {len(aerospace_results)} articles ({rejected_count} rejected)")
-    all_results = aerospace_results
+    all_results = filtered_results
 
     # Sort by relevance score descending
     all_results.sort(key=lambda x: x.get("score", 0), reverse=True)
@@ -310,9 +377,10 @@ def search_aviation_news(
         with open(save_path, "w", encoding="utf-8") as f:
             json.dump({
                 "search_date": datetime.now().isoformat(),
-                "week_start": monday.strftime("%Y-%m-%d"),
-                "week_end": today.strftime("%Y-%m-%d"),
+                "date_range_start": start_date.strftime("%Y-%m-%d"),
+                "date_range_end": today.strftime("%Y-%m-%d"),
                 "days_back": days_back,
+                "date_mode": date_mode,
                 "total_results": len(all_results),
                 "queries_used": queries,
                 "results": all_results,

@@ -1,20 +1,20 @@
 """AMCA Defence Intelligence Video Generator.
 
 End-to-end pipeline:
-  1. Tavily Search  → Find AMCA/defence news articles
-  2. Curation       → Filter & rank with GPT-5-nano (local fallback)
-  3. Scene Planning → Generate video scene plan via GPT
-  4. Image Gen      → Generate infographic images via Azure OpenAI
-  5. TTS            → Generate narration audio
-  6. Video Assembly → Compose final MP4 (with and without voiceover)
+  1. Tavily Search  → Find AMCA/defence news articles (quarterly by default)
+  2. Curation       → AlphaSense-grade filtering & structuring with GPT-5-nano
+  3. Excel Export   → Structured report with Executive Summary, Citations
+  4. Scene Planning → Generate video scene plan via GPT
+  5. Image Gen      → Generate infographic images via Azure OpenAI
+  6. TTS            → Generate narration audio
+  7. Video Assembly → Compose final MP4 (with and without voiceover)
 
 Usage:
-    python main.py                           # Full pipeline
-    python main.py --plan-only               # Stop after scene plan
-    python main.py --skip-images             # Skip image generation
-    python main.py --skip-audio              # Skip TTS
-    python main.py --style photo             # Photorealistic style
-    python main.py --output-dir assets/runs/custom_run
+    python main.py --curation-only               # Stop after curation + Excel (testing)
+    python main.py --plan-only                    # Stop after scene plan
+    python main.py                                # Full pipeline
+    python main.py --date-mode week               # Weekly instead of quarterly
+    python main.py --output-dir assets/runs/q1_2026
 """
 
 import os
@@ -28,10 +28,10 @@ from video_builder import build_video_pair
 
 
 def run_pipeline(args):
-    """Full end-to-end pipeline: Search → Curate → Plan → Images → TTS → Video."""
+    """Full end-to-end pipeline: Search → Curate → Excel → Plan → Images → TTS → Video."""
     from tavily_search import search_aviation_news
     from curation_agent import curate_articles
-    from scene_planner import generate_scene_plan, save_scene_plan, build_context_from_curated
+    from utils.excel_export import export_to_excel
 
     run_dir = args.output_dir
     os.makedirs(run_dir, exist_ok=True)
@@ -44,10 +44,11 @@ def run_pipeline(args):
     print("STEP 1: Searching AMCA & defence news")
     print("=" * 60)
 
-    days_back = args.days_back if args.days_back != 7 else None
+    days_back = args.days_back if args.days_back else None
     search_results = search_aviation_news(
         days_back=days_back,
         save_path=os.path.join(run_dir, "tavily_results.json"),
+        date_mode=args.date_mode,
     )
     if not search_results:
         print("❌ No search results found. Check TAVILY_API_KEY and internet.")
@@ -56,7 +57,7 @@ def run_pipeline(args):
 
     # ─── STEP 2: Curate ──────────────────────────────────────────────
     print("\n" + "=" * 60)
-    print("STEP 2: Curating articles (GPT-5-nano primary)")
+    print("STEP 2: Curating articles (GPT-5-nano, AlphaSense-style)")
     print("=" * 60)
 
     curated = curate_articles(
@@ -70,15 +71,21 @@ def run_pipeline(args):
     print(f"✅ Curated {len(selected)} articles")
 
     # ─── Export to Excel ─────────────────────────────────────────────
-    from utils.excel_export import export_to_excel
     excel_path = os.path.join(run_dir, "articles_report.xlsx")
     export_to_excel(search_results, curated, excel_path)
+
+    if args.curation_only:
+        print(f"\n🛑 Curation-only mode. Results saved to:")
+        print(f"   JSON:  {os.path.join(run_dir, 'curated_articles.json')}")
+        print(f"   Excel: {excel_path}")
+        return
 
     # ─── STEP 3: Scene Plan ──────────────────────────────────────────
     print("\n" + "=" * 60)
     print("STEP 3: Generating video scene plan")
     print("=" * 60)
 
+    from scene_planner import generate_scene_plan, save_scene_plan, build_context_from_curated
     context = build_context_from_curated(curated)
     scene_plan_path = os.path.join(run_dir, "generated_scene_plan.json")
     plan = generate_scene_plan(context, style=args.style)
@@ -165,7 +172,11 @@ def run_pipeline(args):
 def main():
     parser = argparse.ArgumentParser(description="AMCA Defence Intelligence Video Generator")
     parser.add_argument("--output-dir", default="assets/runs/auto", help="Output directory")
-    parser.add_argument("--days-back", type=int, default=7, help="Days back to search (default: auto weekly)")
+    parser.add_argument("--days-back", type=int, default=None, help="Override days back (default: auto)")
+    parser.add_argument("--date-mode", choices=["quarter", "week"], default="quarter",
+                        help="Date range mode (default: quarter = 90 days)")
+    parser.add_argument("--curation-only", action="store_true",
+                        help="Stop after curation + Excel export (no video)")
     parser.add_argument("--plan-only", action="store_true", help="Stop after generating scene plan")
     parser.add_argument("--skip-images", action="store_true", help="Skip image generation")
     parser.add_argument("--skip-audio", action="store_true", help="Skip TTS audio generation")

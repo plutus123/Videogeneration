@@ -1,15 +1,14 @@
-"""Curation agent: filters, ranks, and categorizes articles around AMCA and Indian defence aerospace.
+"""Curation agent: AlphaSense-grade content curation for AMCA and Indian defence aerospace.
 
-Focus areas:
-1. AMCA Program Updates (tenders, RFI, RFQ, airframe, engine, prototype, etc.)
-2. Key Players & Stakeholders (DRDO, GTRE, HAL, Tata, L&T, Bharat Forge, Adani Defence, Reliance)
-3. Defence Technology & Manufacturing (5th/6th gen tech, ToT, MRO, assembly line, etc.)
-
-Each curated article includes its source URL for traceability.
+Produces a structured intelligence report with:
+  - Thematic sections (like AlphaSense: Consortium, Tech Breakthroughs, Engine, Strategy)
+  - Citation-backed facts with [N] references
+  - Source type classification (News, Press Release, Analyst Report)
+  - Precise data preservation (dollar figures, percentages, dates)
 
 Curation modes:
-- PRIMARY: GPT-5-nano (intelligent, context-aware filtering)
-- FALLBACK: Local tiered keyword scoring (when GPT unavailable)
+  - PRIMARY: GPT-5-nano (intelligent, context-aware structured curation)
+  - FALLBACK: Local tiered keyword scoring (when GPT unavailable)
 """
 
 import json
@@ -17,7 +16,7 @@ import os
 
 
 # ---------------------------------------------------------------------------
-# Tiered keyword system for accurate relevance scoring
+# Tiered keyword system for local fallback scoring
 # ---------------------------------------------------------------------------
 
 # Tier 1: AMCA-SPECIFIC — gold-standard signals (5 points each)
@@ -34,27 +33,28 @@ TIER2_HIGH_VALUE = [
     "Tenders", "RFI", "RFQ", "RFP",
     "Transfer of Technology", "ToT",
     "prototype", "Test bed", "Test facility",
-    "Assembly line", "FCAS", "GCAP",
+    "Assembly line", "airframe", "Thrust",
     "Make in India defence", "Atmanirbhar Bharat defence", "Atmanirbhar Bharat",
     "Self Reliance defence", "combat aircraft India",
     "stealth fighter", "stealth aircraft",
     "defence manufacturing India", "defence procurement India",
     "defence export India",
-    # India-specific defence terms
     "Indian Air Force", "IAF", "Indian Navy defence", "Indian Army defence",
     "Indian Army unmanned", "Indian Army technology",
     "India defence budget", "India military",
     "Tejas fighter", "Tejas Mark", "LCA Tejas",
-    "BrahMos", "Akash missile",
+    "BrahMos", "Akash missile", "Astra missile",
+    "MRO", "engine production", "R&D", "R&T",
+    "manufacturing unit", "Supply chain",
+    "titanium", "superalloy", "forging",
+    "wind tunnel", "radar evading", "stealth technology",
+    "F414", "Safran", "GE Aerospace",
 ]
 
 # Tier 3: CONTEXTUAL — only count if Tier 1 or Tier 2 also matched (1 point each)
 TIER3_CONTEXTUAL = [
-    "airframe", "engine", "Thrust", "MRO",
-    "manufacturing unit", "R&D", "R&T",
-    "engine production", "Supply chain",
-    "defence", "defense", "aerospace", "aviation",
-    "fighter", "combat aircraft",
+    "engine", "defence", "defense", "aerospace", "aviation",
+    "fighter", "combat aircraft", "indigenous", "self reliance",
 ]
 
 # Key Players — full names (4 points each)
@@ -67,7 +67,10 @@ KEY_PLAYERS = [
     "Reliance Defence",
     "BEL", "Bharat Electronics",
     "Mazagon Dock", "MDL",
+    "PTC Industries", "MIDHANI",
+    "Data Patterns", "BEML",
     "Indian Air Force", "Indian Army", "Indian Navy",
+    "ADA", "Aeronautical Development Agency",
 ]
 
 # Key Players — short names (1 point, only counted if other signals present)
@@ -77,55 +80,89 @@ KEY_PLAYERS_SHORT = [
 
 
 # ---------------------------------------------------------------------------
-# GPT Curation Prompt
+# AlphaSense-style GPT Curation Prompt
 # ---------------------------------------------------------------------------
-CURATION_PROMPT = """You are a senior defence intelligence analyst at an Indian aerospace company specializing in India's AMCA (Advanced Medium Combat Aircraft) program and Indian defence aerospace.
+CURATION_PROMPT = """You are a senior defence intelligence analyst at an Indian aerospace company.
+Your task is to curate news articles into an AlphaSense-quality structured intelligence report
+focused on India's AMCA (Advanced Medium Combat Aircraft) program and Indian defence aerospace.
 
-You are curating news articles. Your job:
-1. FILTER — be VERY strict. ONLY keep articles about:
+=== FILTERING RULES ===
+1. KEEP articles about:
    - India's AMCA program, Indian fighter/combat aircraft, Indian defence programs
-   - Key Indian defence stakeholders: DRDO, GTRE, HAL, Tata Advanced Systems, L&T, Bharat Forge, Adani Defence, Reliance Defence
-   - AMCA-related topics: tenders, RFI, RFQ, airframe, engine, prototypes, test facilities, assembly lines
-   - Strategic programs relevant to India: FCAS, GCAP, Transfer of Technology, Make in India defence
-   - Indian defence procurement, manufacturing, and exports
+   - Key Indian defence stakeholders: DRDO, ADA, GTRE, HAL, Tata Advanced Systems, L&T, Bharat Forge, Adani Defence, Reliance Defence, BEL, MIDHANI, PTC Industries, Data Patterns, BEML
+   - AMCA-related topics: tenders, RFI, RFQ, RFP, airframe, engine, thrust, prototype, test facilities, assembly lines, MRO, R&D, supply chain
+   - Engine programs: Kaveri, GE F414, Safran joint venture, Rolls-Royce
+   - Strategic: Transfer of Technology, Make in India, Atmanirbhar Bharat, self reliance, defence exports
+   - Weapons integration: Astra missile, BrahMos, stealth-ready weapons
+   - Materials & manufacturing: titanium, superalloy, forging, aerospace materials
 
-   REJECT articles that are:
-   - Non-aerospace (HR, jobs, census, finance, entertainment, AI/tech, cricket, politics)
-   - About non-Indian companies with NO connection to Indian defence
-   - Generic international defence news with no India angle
-   - About Reliance/Tata/L&T/Adani in NON-DEFENCE contexts (telecom, infrastructure, etc.)
-   - From paywalled sources with no readable content
+2. REJECT articles that are:
+   - Non-aerospace (HR, jobs, census, finance, entertainment, cricket, politics, stock prices)
+   - About companies in NON-DEFENCE contexts (telecom, infrastructure, IT)
+   - Generic international defence news with ZERO India angle
+   - Paywalled with no readable content
 
-2. RANK remaining articles by importance (1-10):
-   - 9-10: Directly about AMCA, Kaveri engine, Indian 5th/6th gen fighter
-   - 7-8: About key stakeholders (DRDO, HAL, etc.) in defence/aerospace context
-   - 5-6: About Indian defence manufacturing, procurement, exports
-   - 3-4: About global defence programs relevant to India (FCAS, GCAP, ToT)
-
-3. Tag each article with a bucket:
-   - "amca_program" — directly about AMCA, Indian fighter development, Kaveri engine
-   - "key_players" — about DRDO, GTRE, HAL, Tata, L&T, Bharat Forge, Adani Defence, Reliance in DEFENCE context
-   - "defence_tech" — defence technology, manufacturing, ToT, MRO, FCAS, GCAP, Make in India defence
-
-4. CRITICAL: Preserve the original article URL.
+=== OUTPUT STRUCTURE (AlphaSense-style) ===
+Organize curated articles into THEMATIC SECTIONS. Do NOT just list articles — group them by theme.
 
 OUTPUT valid JSON ONLY:
 {
-  "selected_articles": [
+  "report_title": "AMCA & Indian Defence Aerospace Intelligence Report — [Quarter/Period]",
+  "thematic_sections": [
     {
-      "url": "ORIGINAL_ARTICLE_URL_HERE",
-      "title": "...",
-      "bucket": "amca_program" | "key_players" | "defence_tech",
-      "importance_score": 1-10,
-      "key_facts": ["fact1", "fact2", "fact3"],
-      "summary": "2-3 sentence summary preserving all numbers, dates, company names",
-      "key_players_mentioned": ["DRDO", "HAL", ...],
-      "amca_keywords_found": ["prototype", "engine", ...]
+      "section_title": "e.g. Consortium Shortlisting & Industrial Realignment",
+      "section_summary": "2-3 sentence executive summary of this section's key developments",
+      "articles": [
+        {
+          "citation_number": 1,
+          "url": "ORIGINAL_ARTICLE_URL",
+          "title": "Article title",
+          "published_date": "date if available",
+          "source_type": "News" | "Press Release" | "Government" | "Industry Report",
+          "source_name": "e.g. Business Standard, PIB, Reuters",
+          "importance_score": 1-10,
+          "key_facts": [
+            "Fact 1 with EXACT numbers, dates, dollar figures preserved",
+            "Fact 2 — cite specific company names, percentages",
+            "Fact 3"
+          ],
+          "summary": "3-5 sentence detailed summary. Preserve ALL numbers, dates, company names, dollar figures, percentages.",
+          "key_players_mentioned": ["DRDO", "HAL", ...],
+          "amca_keywords_found": ["prototype", "engine", "ToT", ...]
+        }
+      ]
+    }
+  ],
+  "executive_summary": "Comprehensive 200-word executive summary covering ALL key developments across all sections. Written in authoritative analyst tone.",
+  "citations": [
+    {
+      "citation_number": 1,
+      "source_type": "News",
+      "source_name": "Business Standard",
+      "date": "04 Feb 2026",
+      "title": "Full article title",
+      "url": "full URL"
     }
   ]
 }
 
-Select ONLY genuinely relevant aerospace/defence articles. Better to return 3 good articles than 15 irrelevant ones.
+=== THEMATIC SECTIONS TO USE ===
+Group articles into these sections as applicable (skip sections with zero articles):
+1. "AMCA Program Updates & Consortium Developments"
+2. "Engine Procurement & Foreign Collaboration"
+3. "Technical Breakthroughs & Stealth Integration"
+4. "Key Player Updates (DRDO, HAL, Tata, L&T, Bharat Forge, etc.)"
+5. "Defence Manufacturing, MRO & Supply Chain"
+6. "Strategic & Policy Developments (Make in India, Defence Budget, Exports)"
+7. "Weapons Systems & Platform Integration"
+8. "Materials, Testing & Infrastructure"
+
+=== CRITICAL RULES ===
+- Preserve ALL numbers: dollar figures ($1.5B), percentages (80% ToT), Indian Rupees (Rs150bn)
+- Preserve ALL dates, company names, product names
+- Each article gets a unique citation_number starting from 1
+- Better to return 5 high-quality articles than 20 low-quality ones
+- Source type: "News" for news articles, "Press Release" for company PRs, "Government" for pib.gov.in/mod.gov.in
 
 ARTICLES:
 """
@@ -187,16 +224,34 @@ def _try_get_gpt_client():
         return None, None
 
 
-def _print_curated_articles(articles, mode):
+def _print_curated_articles(result, mode):
     """Print curated articles summary."""
-    print(f"\n  === CURATED ARTICLES ({mode}) ===")
-    for article in articles:
-        print(f"  [{article.get('bucket', '?')}] (Score: {article.get('importance_score', '?')}/10)")
-        print(f"    Title: {article.get('title', 'N/A')}")
-        print(f"    URL:   {article.get('url', 'N/A')}")
-        if article.get("key_players_mentioned"):
-            print(f"    Players: {', '.join(article['key_players_mentioned'])}")
-        print()
+    # Handle both old flat format and new AlphaSense format
+    if "thematic_sections" in result:
+        print(f"\n  === CURATED REPORT ({mode}) ===")
+        print(f"  Title: {result.get('report_title', 'N/A')}")
+        total = 0
+        for section in result.get("thematic_sections", []):
+            articles = section.get("articles", [])
+            total += len(articles)
+            print(f"\n  📑 {section.get('section_title', '?')} ({len(articles)} articles)")
+            for article in articles:
+                print(f"    [{article.get('citation_number', '?')}] (Score: {article.get('importance_score', '?')}/10)")
+                print(f"        {article.get('title', 'N/A')}")
+                print(f"        {article.get('url', 'N/A')}")
+                if article.get("key_players_mentioned"):
+                    print(f"        Players: {', '.join(article['key_players_mentioned'])}")
+        print(f"\n  Total articles: {total}")
+    else:
+        # Legacy flat format
+        print(f"\n  === CURATED ARTICLES ({mode}) ===")
+        for article in result.get("selected_articles", []):
+            print(f"  [{article.get('bucket', '?')}] (Score: {article.get('importance_score', '?')}/10)")
+            print(f"    Title: {article.get('title', 'N/A')}")
+            print(f"    URL:   {article.get('url', 'N/A')}")
+            if article.get("key_players_mentioned"):
+                print(f"    Players: {', '.join(article['key_players_mentioned'])}")
+            print()
 
 
 def curate_articles_local(search_results, save_path="curated_articles.json"):
@@ -235,12 +290,12 @@ def curate_articles_local(search_results, save_path="curated_articles.json"):
             json.dump(result, f, indent=2, ensure_ascii=False)
         print(f"  Curated {len(selected)} articles (local) -> {save_path}")
 
-    _print_curated_articles(selected, "LOCAL")
+    _print_curated_articles(result, "LOCAL")
     return result
 
 
 def curate_articles_gpt(search_results, client, deployment, save_path="curated_articles.json"):
-    """PRIMARY: GPT-based curation using gpt-5-nano."""
+    """PRIMARY: GPT-based AlphaSense-style curation using gpt-5-nano."""
     # Pre-score to prioritize articles sent to GPT
     for article in search_results:
         score, _, _, _, _, _ = _score_article(article)
@@ -248,48 +303,59 @@ def curate_articles_gpt(search_results, client, deployment, save_path="curated_a
 
     search_results.sort(key=lambda x: x.get("_relevance_score", 0), reverse=True)
 
-    # Build context — top 30 articles, content only (no raw_content noise)
+    # Build context — send articles with full content (no truncation)
     articles_text = ""
-    for i, article in enumerate(search_results[:30], 1):
-        content = article.get("content", "")[:2000]
+    for i, article in enumerate(search_results[:50], 1):
+        content = article.get("content", "")
         articles_text += (
             f"\n--- Article {i} ---\n"
             f"URL: {article['url']}\n"
             f"Title: {article.get('title', 'N/A')}\n"
             f"Published: {article.get('published_date', 'N/A')}\n"
+            f"Domain: {article.get('domain', 'N/A')}\n"
             f"Content: {content}\n"
         )
 
-    print("  Curating with GPT-5-nano...")
+    print("  Curating with GPT-5-nano (AlphaSense-style)...")
     response = client.chat.completions.create(
         model=deployment,
         messages=[
-            {"role": "system", "content": "You are an Indian defence aerospace analyst. Output valid JSON only. Reject non-aerospace articles strictly."},
+            {"role": "system", "content": "You are a senior Indian defence aerospace analyst producing AlphaSense-quality structured intelligence reports. Output valid JSON only. Reject non-aerospace articles strictly. Preserve ALL numbers, dates, and company names exactly as they appear."},
             {"role": "user", "content": CURATION_PROMPT + articles_text},
         ],
         response_format={"type": "json_object"},
-        timeout=120,
+        timeout=180,
     )
     result = json.loads(response.choices[0].message.content)
 
-    for article in result.get("selected_articles", []):
-        if not article.get("url"):
-            article["url"] = "URL not available"
+    # Ensure all articles have URLs
+    for section in result.get("thematic_sections", []):
+        for article in section.get("articles", []):
+            if not article.get("url"):
+                article["url"] = "URL not available"
+
+    # Also build a flat selected_articles list for backward compatibility
+    all_articles = []
+    for section in result.get("thematic_sections", []):
+        for article in section.get("articles", []):
+            article["bucket"] = section.get("section_title", "defence_tech")
+            all_articles.append(article)
+    result["selected_articles"] = all_articles
 
     if save_path:
         os.makedirs(os.path.dirname(save_path) or ".", exist_ok=True)
         with open(save_path, "w", encoding="utf-8") as f:
             json.dump(result, f, indent=2, ensure_ascii=False)
-        print(f"  Curated {len(result.get('selected_articles', []))} articles -> {save_path}")
+        print(f"  Curated {len(all_articles)} articles -> {save_path}")
 
-    _print_curated_articles(result.get("selected_articles", []), "GPT")
+    _print_curated_articles(result, "GPT")
     return result
 
 
 def curate_articles(search_results, save_path="curated_articles.json"):
     """Filter and rank search results for AMCA/Indian defence relevance.
 
-    PRIMARY: GPT-5-nano | FALLBACK: Local keyword scoring
+    PRIMARY: GPT-5-nano (AlphaSense-style) | FALLBACK: Local keyword scoring
     """
     client, deployment = _try_get_gpt_client()
 
