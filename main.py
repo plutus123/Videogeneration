@@ -88,7 +88,7 @@ def run_pipeline(args):
     from scene_planner import generate_scene_plan, save_scene_plan, build_context_from_curated
     context = build_context_from_curated(curated)
     scene_plan_path = os.path.join(run_dir, "generated_scene_plan.json")
-    plan = generate_scene_plan(context, style=args.style)
+    plan = generate_scene_plan(context, style=args.style, slides=args.slides)
     save_scene_plan(plan, scene_plan_path)
 
     scenes = plan.get("scenes", [])
@@ -184,6 +184,8 @@ def main():
     parser.add_argument("--voice", default="alloy", help="TTS voice (default: alloy)")
     parser.add_argument("--style", choices=["photo", "infographic"], default="infographic",
                         help="Visual style (default: infographic)")
+    parser.add_argument("--slides", type=int, default=3,
+                        help="Number of slides: 3 for Q&A briefing (default), 0 for full multi-scene")
     args = parser.parse_args()
     run_pipeline(args)
 

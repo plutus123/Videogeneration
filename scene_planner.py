@@ -183,19 +183,143 @@ Output JSON:
 
 """
 
+# ---------------------------------------------------------------------------
+# 3-SLIDE BRIEFING prompt — answers 3 key questions
+# ---------------------------------------------------------------------------
+THREE_SLIDE_BRIEFING_PROMPT = """You are an expert video producer creating a 3-SLIDE WEEKLY INTELLIGENCE BRIEFING video for the leadership team of an Indian aerospace & defence company working on the AMCA program.
 
-def generate_scene_plan(context, model=None, style="infographic"):
+The video has EXACTLY 3 slides. Each slide answers ONE key question.
+
+STRICT RULES:
+- EXACTLY 3 scenes. No more. No less.
+- Target TOTAL duration: 40-45 seconds.
+- Each scene: ~13-15 seconds, with audio_script of 33-38 words.
+- TTS reads at 2.5 words per second.
+- duration_seconds MUST match audio_script word count / 2.5.
+- ONLY use facts from the provided context. NEVER hallucinate.
+- CRITICAL: Narration must be EXTREMELY DENSE and INFORMATION-PACKED. Every single word must carry maximum information. No filler phrases. Name specific companies, figures, dates. Do NOT miss important developments — compress, don't skip.
+
+THE 3 QUESTIONS (one per slide):
+
+SLIDE 1: "WHAT HAPPENED?"
+- Cover the most important AMCA/defence developments from this period
+- Name specific companies, deals, dollar figures, dates
+- Section label: "KEY DEVELOPMENTS"
+
+SLIDE 2: "WHY DOES IT MATTER?"
+- Analyze the strategic implications of the developments from Slide 1
+- How do they impact the AMCA program, Indian defence manufacturing, key stakeholders?
+- Connect the dots between different developments
+- Section label: "STRATEGIC IMPACT"
+
+SLIDE 3: "WHAT'S NEXT?"
+- Outlook: what should leadership watch for in the coming weeks/months?
+- Upcoming milestones, decisions, deadlines, risks
+- Section label: "OUTLOOK & WATCH LIST"
+
+NARRATION RULES:
+- Slide 1 audio MUST start with: "This week:"
+- Slide 2 audio MUST start with: "Why it matters:"
+- Slide 3 audio MUST start with: "Watch for:"
+- Tone: professional, executive-briefing, factual, confident.
+- Preserve ALL numbers, names, dollar figures, percentages.
+- No ellipses (...) or multiple dashes (--) — they cause TTS pauses.
+- Write in TELEGRAPHIC style: dense facts, no filler words. Example: "This week: ADA shortlisted Tata, L&T-BEL, and Bharat Forge consortia for AMCA prototype. HAL excluded. GE-HAL finalizing F414 assembly in India."
+
+VISUAL STYLE — DOSSIER INFOGRAPHIC:
+Each visual_prompt must describe an intelligence briefing infographic card with EXACTLY these rules:
+
+BACKGROUND & TEXTURE:
+- Off-white/cream parchment background (#F2EDE0), NOT pure white
+- Subtle grid overlay at very low opacity
+- Technical crosshair/registration marks (+) in corners
+- Horizontal/landscape orientation
+
+TYPOGRAPHY:
+- Headlines: Bold dark navy (#1A2744), large sans-serif
+- Body: IBM Plex Mono or similar monospace in dark charcoal
+- Labels: All-caps monospace, letter-spaced
+- Accent subheadings: Steel blue (#4A90B8)
+
+COLOR PALETTE (strict 4-color max):
+- Dark navy: #1A2744 (headers)
+- Burnt orange: #C0622A (alerts/warnings)
+- Steel blue: #4A8FB5 (data highlights)
+- Olive green: #6B7A45 (secondary)
+- Background cream: #F2EDE0
+
+LAYOUT:
+- Clean ruled border around entire composition
+- 2-4 clearly separated card regions with thin borders
+- Mix of bold KEY STAT (large, left/center) with supporting bullet points
+- Flat technical blueprint iconography (jets, factories, shields, charts)
+
+CONTENT STRUCTURE for each card:
+- Top: ALL-CAPS category label + question
+- Center-left: 1 large bold headline stat or icon
+- Center-right: 3-5 monospace bullet points
+- Bottom: thin rule + source label in small monospace
+
+Every visual_prompt MUST begin with: "Intelligence briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0)."
+
+ANTI-HALLUCINATION: visual_prompts must ONLY reference EXACT data from headline_stat and bullet_points. NEVER invent percentages or stats.
+
+Output JSON:
+{
+  "textual_summary": "Factual summary covering all articles",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "section": "KEY DEVELOPMENTS",
+      "question": "What happened?",
+      "article_source": "Primary articles this scene covers",
+      "duration_seconds": 50,
+      "category_label": "KEY DEVELOPMENTS",
+      "headline_stat": "$1.5B",
+      "headline_caption": "F414 Engine Deal",
+      "icon_type": "jet",
+      "bullet_points": ["Fact 1", "Fact 2", "Fact 3", "Fact 4"],
+      "source_label": "Sources: defence.in, janes.com | Q1 2026",
+      "accent_color": "blue",
+      "visual_prompt": "Intelligence briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). [detailed card description]",
+      "audio_script": "This week in Indian defence aerospace... [100-150 words covering key facts]",
+      "on_screen_text": "WHAT HAPPENED?"
+    },
+    {
+      "scene_number": 2,
+      "section": "STRATEGIC IMPACT",
+      "question": "Why does it matter?",
+      ...
+    },
+    {
+      "scene_number": 3,
+      "section": "OUTLOOK & WATCH LIST",
+      "question": "What's next?",
+      ...
+    }
+  ],
+  "overall_style": "flat infographic, technical illustration"
+}
+
+"""
+
+
+
+def generate_scene_plan(context, model=None, style="infographic", slides=3):
     """Generate a scene plan using GPT.
 
     Args:
         context:  Assembled article context string.
         model:    Override chat deployment name.
         style:    "photo" for photorealistic, "infographic" for classified dossier.
+        slides:   3 for 3-slide Q&A briefing (default), 0 for full multi-scene.
     """
     client = get_azure_client()
     deployment = model or get_chat_deployment()
 
-    if style == "infographic":
+    if slides == 3:
+        prompt = THREE_SLIDE_BRIEFING_PROMPT
+    elif style == "infographic":
         prompt = INFOGRAPHIC_PRODUCER_PROMPT
     else:
         prompt = VIDEO_PRODUCER_PROMPT
@@ -203,7 +327,7 @@ def generate_scene_plan(context, model=None, style="infographic"):
     response = client.chat.completions.create(
         model=deployment,
         messages=[
-            {"role": "system", "content": "You are an expert video producer and aviation analyst. Output valid JSON only."},
+            {"role": "system", "content": "You are an expert video producer and Indian defence aerospace analyst. Output valid JSON only."},
             {"role": "user", "content": prompt + context}
         ],
         response_format={"type": "json_object"},

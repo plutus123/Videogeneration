@@ -1,0 +1,72 @@
+{
+  "textual_summary": "AMCA advance accelerates private consortia participation with HAL exclusion, three bidders remain, and L1 cost-based selection. Aviation Week corroborates HAL knockout with TASL, L&T, and Kalyani Group contending; final award anticipated in coming months. Separately, India approves a 3.6 trillion rupee defence upgrade (Rafale and P-8I), with HAL engine-delivery constraints impacting Tejas Mk1A and Macron’s visit signaling France-India aerospace collaboration. watch for RFP cadence, domestic capacity shifts, and international partnerships shaping AMCA timelines.",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "section": "KEY DEVELOPMENTS",
+      "question": "What happened?",
+      "article_source": "ARTICLE [1]",
+      "duration_seconds": 14,
+      "category_label": "KEY DEVELOPMENTS",
+      "headline_stat": "Rs 15,000 crore",
+      "headline_caption": "AMCA FIVE PROTOTYPES",
+      "icon_type": "jet",
+      "bullet_points": [
+        "AMCA shortlists three consortia: TASL; L&T-BEL-Dynamatic; Bharat Forge-BEML-Data Patterns",
+        "HAL reportedly excluded after thresholds",
+        "RFP for five prototypes; L1 evaluation dominates",
+        "Final award expected soon"
+      ],
+      "source_label": "Sources: Moneycontrol | Q1 2026",
+      "accent_color": "steel_blue",
+      "visual_prompt": "Intelligence briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). Card features TOP: KEY DEVELOPMENTS, center-left: large stat 'Rs 15,000 crore', center-right: four bullets detailing three consortia, HAL exclusion, RFP for five prototypes, L1 emphasis; bottom: source label. Include crosshair marks, faint grid, blueprint jet and factory icons; palette limited to dark navy, steel blue, burnt orange, olive green; thin borders separate sections.",
+      "audio_script": "This week AMCA shortlists three consortia—Tata Advanced Systems, L&T with BEL and Dynamatic Technologies, Bharat Forge with BEML and Data Patterns; HAL excluded. RFP for five prototypes; Rs 15,000 crore; L1 bid dominates; award next.",
+      "on_screen_text": "WHAT HAPPENED?"
+    },
+    {
+      "scene_number": 2,
+      "section": "STRATEGIC IMPACT",
+      "question": "Why does it matter?",
+      "article_source": "ARTICLE [4]",
+      "duration_seconds": 14,
+      "category_label": "STRATEGIC IMPACT",
+      "headline_stat": "Private sector leadership",
+      "headline_caption": "AMCA: STRATEGIC SHIFT",
+      "icon_type": "factory",
+      "bullet_points": [
+        "Private-sector leadership rises: TASL, L&T-BEL-Dynamatic, Kalyani Group in race",
+        "HAL knocked out of AMCA production race per Aviation Week",
+        "Final selection expected in coming months; private bids drive schedule",
+        "Cost-led L1 focus pressures supplier diversification and PM's Make in India aims"
+      ],
+      "source_label": "Sources: Aviation Week Network | 2024-2026",
+      "accent_color": "steel_blue",
+      "visual_prompt": "Intelligence briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). Card 2: TOP label STRATEGIC IMPACT, center-left large icon representing private consortium leadership, center-right bullets linking HAL exclusion to private participation, bottom source. Include crosshair marks, grid, and blueprint icons of a fighter jet and assembly line. Color scheme: navy heading, steel blue highlights, burnt orange alerts, olive secondary.",
+      "audio_script": "Why it matters: Private AMCA leadership accelerates Make in India, expands domestic talent, and mitigates HAL capacity risk. L1 emphasis may favor cost over tech, while Kalyani/L&T/TASL shape domestic defence manufacturing trajectory.",
+      "on_screen_text": "WHY DOES IT MATTER?"
+    },
+    {
+      "scene_number": 3,
+      "section": "OUTLOOK & WATCH LIST",
+      "question": "What's next?",
+      "article_source": "ARTICLE [5]",
+      "duration_seconds": 14,
+      "category_label": "OUTLOOK & WATCH LIST",
+      "headline_stat": "Rs 3.6 trillion",
+      "headline_caption": "DEFENCE UPGRADE",
+      "icon_type": "shield",
+      "bullet_points": [
+        "DAC nod: 3.6 trillion rupees; Rafale jets + P-8I",
+        "HAL engine supply issues with GE affecting Tejas Mk1A timeline",
+        "180 Mk-1A on order; delays hinge on propulsion supply",
+        "Macron visit forthcoming; France-India aerospace cooperation in focus"
+      ],
+      "source_label": "Sources: Reuters | 2026-02-12",
+      "accent_color": "steel_blue",
+      "visual_prompt": "Intelligence briefing infographic, dossier style, horizontal landscape layout, cream parchment background (#F2EDE0). Card 3: TOP label OUTLOOK & WATCH LIST, center-left large stat 'Rs 3.6 trillion', center-right bullets detailing Rafale/P-8I, HAL engine issues, Mk-1A orders, Macron visit; bottom source. Include crosshair marks, grid, blueprint icons of missiles and aircraft; maintain palette of navy, steel blue, burnt orange, olive.",
+      "audio_script": "Watch for: RFP issuance to AMCA bidders; final award within months; FY30 flight-test horizon remains. Monitor HAL order-book pressures, GE engine supply impact on Tejas Mk1A, and Rafale/P-8I procurement for aerospace cooperation, Macron visit.",
+      "on_screen_text": "WHAT'S NEXT?"
+    }
+  ],
+  "overall_style": "flat infographic, technical illustration"
+}
